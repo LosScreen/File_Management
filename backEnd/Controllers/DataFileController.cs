@@ -87,7 +87,6 @@ namespace backEnd.Controllers
                 string sql = $"INSERT INTO DataFile(NameFile, Path, Type) VALUES ('{datafile.NameFile}','{datafile.Path}', '{datafile.Type}')";
                 db.executeQuery(sql);
                 res.msg = "okay";
-                // return null;
             }catch(Exception ex){
                 res.msg = ex.Message;
                 res.data = datafile;
