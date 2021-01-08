@@ -41,7 +41,7 @@ namespace backEnd.Controllers
             DataFile data = new DataFile();
             var db = new ConMySQL();
             List<DataFile> list_result = new List<DataFile>();
-            // try{
+            try{
             // string sql = $"SELECT * FROM DataFile WHERE Path={path}";
             string sql = string.Format("SELECT * FROM DataFile WHERE Path = '{0}'", path);
             Console.WriteLine(sql);
@@ -53,24 +53,15 @@ namespace backEnd.Controllers
                 obj.NameFile = dr["namefile"].ToString();
                 obj.Path = dr["path"].ToString();
                 obj.Type = dr["type"].ToString();
-                obj.File = dr["file"].ToString();
-                // JsonConvert.SerializeObject(data,Formatting.Indented);
                 list_result.Add(obj);
-                // Console.WriteLine(JsonConvert.SerializeObject(data, Formatting.Indented));
-                // Console.WriteLine(JsonConvert.SerializeObject(data));
+            }
+            }catch(Exception ex){
+                res.msg = ex.Message;
+                res.listdata = list_result;
+                Console.WriteLine(res);
             }
             
-            Console.WriteLine(JsonConvert.SerializeObject(list_result, Formatting.Indented));
-            // Console.WriteLine(JsonConvert.SerializeObject(data, Formatting.Indented));
-            // res.msg = "okay";
-            // res.listdata = list_result;
-            // return res;
-
-            // }catch (Exception ex){
-            //     res.msg = ex.Message;
-            //     res.listdata = list_result;
-            //     return res;
-            // }
+            // Console.WriteLine(JsonConvert.SerializeObject(list_result, Formatting.Indented));
             
             return list_result;
         }
