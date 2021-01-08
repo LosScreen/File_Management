@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "/Users/piyapon/.dotnet/store/|arch|/|tfm|",
+      "/Users/piyapon/.nuget/packages"
+    ]
+  }
+}
