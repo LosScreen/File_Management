@@ -161,7 +161,6 @@ namespace backEnd.Controllers
             try{
                 string type = null;
                 string path = null;
-                // int valueType = 0;
                 var db = new ConMySQL();
                 string uploads = Path.Combine(@"FolderData", "uploads");
                 foreach (IFormFile file in datafile.filedata)
@@ -266,7 +265,7 @@ namespace backEnd.Controllers
         }
 
         [HttpPost]
-        [Route("deleteFile/{NameFile}")]
+        [Route("deleteFile")]
         public ResponseErr deleteFile([FromBody] DataFile datafile)
         {
             ResponseErr res = new ResponseErr();
