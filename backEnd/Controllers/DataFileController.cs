@@ -200,7 +200,7 @@ namespace backEnd.Controllers
             Console.WriteLine(startupPath);
             // return File(@"/FolderData/uploads/duck.png", "image/png", "duck.png");
             
-            IFileProvider provider = new PhysicalFileProvider("/Users/piyapon/Desktop/File_Management/backEnd/FolderData/uploads" + datafile.Path);
+            IFileProvider provider = new PhysicalFileProvider(startupPath +"/FolderData/uploads" + datafile.Path);
             IFileInfo fileInfo = provider.GetFileInfo(nameFile);
             var readStream = fileInfo.CreateReadStream();
             var mimeType = "image/png";
@@ -211,8 +211,10 @@ namespace backEnd.Controllers
         [Route("createFolder")]
         public ResponseErr createFolderDate([FromBody] DataFile datafile)
         {
+            string startupPath = Environment.CurrentDirectory;
+            // Console.WriteLine(startupPath);
             ResponseErr res = new ResponseErr();
-            string path = "/Users/piyapon/Desktop/File_Management/backEnd/FolderData/uploads" + datafile.Path;
+            string path = startupPath+"/FolderData/uploads" + datafile.Path;
             Console.WriteLine(path);
             try
         {
@@ -234,8 +236,10 @@ namespace backEnd.Controllers
         [Route("deleteFolder")]
         public ResponseErr deleteFolder([FromBody] DataFile datafile)
         {
+            string startupPath = Environment.CurrentDirectory;
+            // Console.WriteLine(startupPath);
             ResponseErr res = new ResponseErr();
-            string path = "/Users/piyapon/Desktop/File_Management/backEnd/FolderData/uploads" + datafile.Path;
+            string path = startupPath + "/FolderData/uploads" + datafile.Path;
             Console.WriteLine(path);
             try
         {
@@ -258,9 +262,12 @@ namespace backEnd.Controllers
         [Route("deleteFile")]
         public ResponseErr deleteFile([FromBody] DataFile datafile)
         {
+            string startupPath = Environment.CurrentDirectory;
+            // Console.WriteLine(startupPath);
             ResponseErr res = new ResponseErr();
+            // + "FolderData" + datafile.Path + datafile.NameFile
             try{
-                var fileInfo = new System.IO.FileInfo("/Users/piyapon/Desktop/File_Management/backEnd/FolderData" + datafile.Path + datafile.NameFile);
+                var fileInfo = new System.IO.FileInfo(startupPath + "/FolderData" + datafile.Path + datafile.NameFile);
                 fileInfo.Delete();
                 res.msg = "Okay";
                 return res;
