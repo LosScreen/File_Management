@@ -33,17 +33,17 @@ namespace backEnd.Controllers
         {
             _logger = logger;
         }
-        [HttpGet]
-        [Route("getData/{path}")]
-        public IEnumerable<DataFile> GetDataFiles(string path)
+        [HttpPost]
+        [Route("getData")]
+        public IEnumerable<DataFile> GetDataFiles([FromBody] DataFile datafile)
         {
             ResponseErr res = new ResponseErr();
             DataFile data = new DataFile();
             var db = new ConMySQL();
             List<DataFile> list_result = new List<DataFile>();
             try{
-            // string sql = $"SELECT * FROM DataFile WHERE Path={path}";
-            string sql = string.Format("SELECT * FROM DataFile WHERE Path = '{0}'", path);
+            // string sql = $"SELECT * FROM DataFile";
+            string sql = string.Format("SELECT * FROM DataFile WHERE Path = '{0}'", datafile.Path);
             Console.WriteLine(sql);
             DataTable SqlDataSet = db.getData(sql);
             
@@ -152,7 +152,8 @@ namespace backEnd.Controllers
                 string type = null;
                 string path = null;
                 var db = new ConMySQL();
-                string uploads = Path.Combine(@"FolderData", "uploads");
+                string uploads = Path.Combine(@"FolderData", "uploads"+"/"+datafile.Path);
+                Console.WriteLine(datafile.filedata);
                 foreach (IFormFile file in datafile.filedata)
                 {
                     if (file.Length > 0) 
@@ -164,7 +165,7 @@ namespace backEnd.Controllers
                         // Console.WriteLine(file.ContentType.Contains("image"));
                         if (file.ContentType.StartsWith("image"))
                         {
-                            path = "/" + file.FileName;
+                            path = "/" + datafile.Path;
                             type = "image";
                             string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File) VALUES ('{file.FileName}','{path}', 'image', '{file.ContentType}')";
                             db.executeQuery(sql);
@@ -186,7 +187,7 @@ namespace backEnd.Controllers
                 res.msg = "okay";
                 return res;
             }catch(Exception ex){
-                res.msg = ex.ToString();
+                res.msg = ex.Message;
                 res.data = datafile.Id;
                 return res;
             }
@@ -212,15 +213,18 @@ namespace backEnd.Controllers
         public ResponseErr createFolderDate([FromBody] DataFile datafile)
         {
             string startupPath = Environment.CurrentDirectory;
+            var db = new ConMySQL();
             // Console.WriteLine(startupPath);
             ResponseErr res = new ResponseErr();
-            string path = startupPath+"/FolderData/uploads" + datafile.Path;
+            string path = startupPath+"/FolderData" + datafile.Path +"/" + datafile.NameFile;
             Console.WriteLine(path);
             try
         {
             Directory.CreateDirectory(path);
             Console.WriteLine("The directory was created successfully at {0}.", Directory.GetCreationTime(path));
             res.msg = "okay";
+            string sql = $"INSERT INTO DataFile(NameFile, Path, Type) VALUES ('{datafile.NameFile}','{datafile.Path}', 'Folder')";
+            db.executeQuery(sql);
             return res;
         }
         catch (Exception e)

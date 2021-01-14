@@ -31,6 +31,15 @@ namespace backEnd
                 c.MultipartHeadersLengthLimit = 450000000;
             });
             services.AddControllers().AddNewtonsoftJson();
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                              builder =>
+                              {
+                                  builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                              });
+            });
             // services.AddDbContext<DBContext>(options => options.UseSqlServer(connectionString));
 
       
@@ -50,6 +59,8 @@ namespace backEnd
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseCors();
 
             app.UseEndpoints(endpoints =>
             {
