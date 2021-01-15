@@ -68,11 +68,12 @@ export default {
   },
   methods: {
     getData() {
+      this.pathFile.path = "/uploads"
       if(this.$store.state.path == ""){
         this.pathFile.path = "/uploads";
       }
       else{
-        this.pathFile.path = this.pathFile.path + "/" + this.$store.state.path;
+        this.pathFile.path += "/" + this.$store.state.path;
       }
       // console.log(this.pathFile.path);
       this.$axios
@@ -87,12 +88,15 @@ export default {
     },
     Test(nameFile,type){
       // console.log(nameFile,type);
-      if(type == 'Folder'){
+      if(type == 'Folder'&& this.$store.state.path == ""){
       this.$store.state.path = nameFile;
       this.getData();
+      console.log(this.$store.state.path);
       }
-      else{
-        // console.log(nameFile,type);
+      else if (type == 'Folder') {
+        this.$store.state.path += "/" + nameFile;
+        this.getData();
+        console.log(this.$store.state.path);
       }
       // console.log(this.$store.state.path);
     }

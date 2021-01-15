@@ -151,8 +151,13 @@ namespace backEnd.Controllers
             try{
                 string type = null;
                 string path = null;
+                string uploads= null;
                 var db = new ConMySQL();
-                string uploads = Path.Combine(@"FolderData", "uploads"+"/"+datafile.Path);
+                if(datafile.Path != "root"){
+                    uploads = Path.Combine(@"FolderData", "uploads"+"/"+datafile.Path);
+                }else{
+                    uploads = Path.Combine(@"FolderData", "uploads");
+                }
                 Console.WriteLine(datafile.filedata);
                 foreach (IFormFile file in datafile.filedata)
                 {
@@ -165,18 +170,34 @@ namespace backEnd.Controllers
                         // Console.WriteLine(file.ContentType.Contains("image"));
                         if (file.ContentType.StartsWith("image"))
                         {
-                            path = "/" + datafile.Path;
+                            Console.WriteLine(datafile.Path);
+                            if(datafile.Path == "root"){
+                                path = "/uploads" ;
+                            }
+                            else if (datafile.Path != ""){
+                                path = "/uploads/" + datafile.Path;
+                            }
                             type = "image";
                             string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File) VALUES ('{file.FileName}','{path}', 'image', '{file.ContentType}')";
                             db.executeQuery(sql);
                         }else if (file.ContentType.StartsWith("application"))
                         {
-                            path = "/" + file.FileName;
+                            if(datafile.Path != ""){
+                            path = "/uploads/" + datafile.Path;
+                            }
+                            else{
+                                path = "/uploads" ;
+                            }
                             type = "application";
                             string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File) VALUES ('{file.FileName}','{path}', 'application', '{file.ContentType}')";
                             db.executeQuery(sql);
                         }else{
-                            path = "/" + file.FileName;
+                            if(datafile.Path != ""){
+                            path = "/uploads/" + datafile.Path;
+                            }
+                            else{
+                                path = "/uploads" ;
+                            }
                             type = "unknow";
                             string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File) VALUES ('{file.FileName}','{path}', 'application', '{file.ContentType}')";
                             db.executeQuery(sql);
@@ -244,9 +265,29 @@ namespace backEnd.Controllers
             // Console.WriteLine(startupPath);
             ResponseErr res = new ResponseErr();
             string path = startupPath + "/FolderData/uploads" + datafile.Path;
-            Console.WriteLine(path);
+            string pathdel = "/uploads" + datafile.Path;
+            // Console.WriteLine(path);
+            System.IO.DirectoryInfo di = new DirectoryInfo(path);
+
+            var db = new ConMySQL();
             try
         {
+
+           foreach (FileInfo file in di.GetFiles())
+            {
+               file.Delete(); 
+            }
+            foreach (DirectoryInfo dir in di.GetDirectories())
+            {   
+                dir.Delete(true); 
+            }
+
+            string sql = $"Delete From datafile Where Path like '{pathdel}%'";
+            db.delete(sql);
+
+            string sqlId = $"Delete From datafile Where ID = {datafile.Id}";
+            db.delete(sqlId);
+
             Directory.Delete(path);
             Console.WriteLine("The directory was delete successfully at {0}.", Directory.GetCreationTime(path));
             res.msg = "okay";
@@ -272,7 +313,7 @@ namespace backEnd.Controllers
             // + "FolderData" + datafile.Path + datafile.NameFile
             try{
                 var fileInfo = new System.IO.FileInfo(startupPath + "/FolderData" + datafile.Path + datafile.NameFile);
-                fileInfo.Delete();
+                    fileInfo.Delete();
                 res.msg = "Okay";
                 return res;
             }catch(Exception e){

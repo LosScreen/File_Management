@@ -40,12 +40,13 @@ export default {
   },
   methods: {
     getData() {
+      this.pathFile.path = "/uploads"
       // console.log(this.$axios);
      if(this.$store.state.path == ""){
         this.pathFile.path = "/uploads";
       }
       else{
-        this.pathFile.path = this.pathFile.path + "/" + this.$store.state.path;
+        this.pathFile.path += "/" + this.$store.state.path;
       }
       console.log(this.pathFile);
       this.$axios

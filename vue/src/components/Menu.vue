@@ -58,9 +58,15 @@ export default {
   methods: {
     submitFile() {
       let formData = new FormData();
-      formData.append("file", this.file);
-      this.fileData.filedata = formData;
-      this.fileData.path = this.$store.state.path;
+      formData.append("filedata", this.file);
+      if(this.$store.state.path != ""){
+      formData.append("path", this.$store.state.path);
+      }
+      else if (this.$store.state.path == ""){
+        formData.append("path", "root");
+      }
+      // this.fileData.filedata = formData;
+      // this.fileData.path = this.$store.state.path;
 
       this.$axios
         .post("DataFile/putfile2", formData, {
@@ -73,14 +79,16 @@ export default {
             );
           }.bind(this),
         })
-        .then(function () {
+        .then(() => {
+          this.getData();
           console.log("SUCCESS!!");
         })
-        .catch(function () {
-          console.log("FAILURE!!");
+        .catch(function (error) {
+          console.log(error);
         });
     },
     handleFileUpload() {
+      // console.log(this.$refs.file.files[0]);
       this.file = this.$refs.file.files[0];
     },
     Test() {
@@ -105,10 +113,11 @@ export default {
         });
     },
     getData() {
+      this.pathFile.path = "/uploads"
       if (this.$store.state.path == "") {
         this.pathFile.path = "/uploads";
       } else {
-        this.pathFile.path = this.pathFile.path + "/" + this.$store.state.path;
+        this.pathFile.path +="/" + this.$store.state.path;
         console.log(this.pathFile.path);
       }
       // console.log(this.pathFile.path);
