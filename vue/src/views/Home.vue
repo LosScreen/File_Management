@@ -53,6 +53,7 @@ export default {
         .post("DataFile/getdata", this.pathFile)
         .then(response => {
           this.$store.state.dataFile = response.data;
+          // console.log(this.$store.state.dataFile)
           // console.log(this.$store.state.dataFile);
           // console.log(this.dataFile);
           // console.log(response.data);

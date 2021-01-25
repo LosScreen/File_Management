@@ -63,7 +63,7 @@ export default {
       formData.append("path", this.$store.state.path);
       }
       else if (this.$store.state.path == ""){
-        formData.append("path", "root");
+        formData.append("path", "");
       }
       // this.fileData.filedata = formData;
       // this.fileData.path = this.$store.state.path;
@@ -103,6 +103,7 @@ export default {
         this.New_Folder.Path = "/uploads" + "/" + this.$store.state.path;
       }
       // console.log(this.New_Folder);
+      if(this.$store.state.NameFile != ""){
       this.$axios
         .post("DataFile/createfolder", this.New_Folder)
         .then(() => {
@@ -111,6 +112,9 @@ export default {
         .catch((error) => {
           console.error(error);
         });
+      }else{
+        alert("Name Folder is Null");
+      }
     },
     getData() {
       this.pathFile.path = "/uploads"

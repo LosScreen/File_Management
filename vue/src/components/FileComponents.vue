@@ -1,23 +1,58 @@
 <template>
   <div class="row">
     <div class="col" v-for="(item, inx) in $store.state.dataFile" :key="inx">
-      <div v-on:click="Test(item.nameFile,item.type)" class="card Card-Box" style="width: 18rem">
+      <!-- Test(item.nameFile, item.type) -->
+      <div
+        v-if="item.type != 'Folder'"
+        @contextmenu.prevent="$refs.menu.open"
+        @click.right="logFile(item)"
+        @click.left="Preview(item.wwwPath)"
+        class="card Card-Box"
+        style="width: 18rem"
+      >
         <img
           v-if="item.type == 'image'"
           class="card-img-top Card-Image mx-auto"
-          src="@/assets/folderIcon/ImageDefault.png"
+          :src="item.wwwPath"
           alt="Card image cap"
         />
         <img
+          v-if="item.type == 'video'"
+          class="card-img-top Card-Image mx-auto"
+          :src="item.wwwPath"
+          alt="Card image cap"
+        />
+        <!-- <img 
           v-if="item.type == 'Folder'"
+          @click="openFolder(item.nameFile, item.type)"
           class="card-img-top Card-Image mx-auto"
           src="@/assets/folderIcon/FolderDefault.png"
           alt="Card image cap"
-        />
+        /> -->
         <img
           v-if="item.type == 'application'"
           class="card-img-top Card-Image mx-auto"
           src="@/assets/folderIcon/ImageDefault.png"
+          alt="Card image cap"
+        />
+        <div class="card-body">
+          {{ item.nameFile }}
+          {{ item.type }}
+        </div>
+      </div>
+
+      <div
+        v-if="item.type == 'Folder'"
+        @contextmenu.prevent="$refs.menu.open"
+        @click.right="logFile(item)"
+        @click="openFolder(item.nameFile, item.type)"
+        class="card Card-Box"
+        style="width: 18rem"
+      >
+        <img
+          v-if="item.type == 'Folder'"
+          class="card-img-top Card-Image mx-auto"
+          src="@/assets/folderIcon/FolderDefault.png"
           alt="Card image cap"
         />
         <div class="card-body">
@@ -48,11 +83,39 @@
         </div>
       </div> -->
     </div>
+
+    <vue-context ref="menu" style="height: fit-content; width: fit-content">
+      <li v-if="dataFile.type == 'Folder'">
+        <a
+          href="#"
+          @click.prevent="openFolder(dataFile.nameFile, dataFile.type)"
+          >Open</a
+        >
+      </li>
+      <li v-if="dataFile.type != 'Folder'">
+        <a href="#" @click.prevent="downloadFile(dataFile)">Downloads</a>
+      </li>
+      <li v-if="dataFile.type == 'Folder'">
+        <a href="#" @click.prevent="removeFolder()">Remove Folder</a>
+      </li>
+      <li v-if="dataFile.type != 'Folder'">
+        <a href="#" @click.prevent="removeFile()">Remove File</a>
+      </li>
+    </vue-context>
   </div>
 </template>
 
+
 <script>
+import VueContext from "vue-context";
+
+// import axios from "axios";
+
 export default {
+  components: {
+    VueContext,
+  },
+
   name: "FileComponents",
   props: {
     //    dataFile: [
@@ -67,39 +130,108 @@ export default {
     //   ],
   },
   methods: {
-    getData() {
-      this.pathFile.path = "/uploads"
-      if(this.$store.state.path == ""){
-        this.pathFile.path = "/uploads";
+    downloadFile(data) {
+      this.dataFile = data;
+      const str = this.dataFile.nameFile + "?path=" + this.dataFile.path;
+      const FileDownload = require("js-file-download");
+       this.$axios
+        .get("DataFile/download/"+str,  {responseType: 'blob'})
+        // responseType: 'blob'
+        .then((response) => {
+          FileDownload(response.data, this.dataFile.nameFile);
+          // console.log(JSON.stringify(response.data));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    Preview(data) {
+      window.open(data, "_blank");
+    },
+    getPhoto(data) {
+      this.dataFile = data;
+      console.log(data);
+      if (this.dataFile.type == "image") {
+        this.$axios
+          .post("DataFile/GetPhoto", this.dataFile)
+          .then((res) => {
+            // console.log("Okay");
+            // this.pathPhoto = res.data;
+            console.log(res.data);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        console.log("error");
       }
-      else{
+    },
+
+    alert(e) {
+      console.log(e);
+    },
+    logFile(data) {
+      this.dataFile = data;
+      console.log(this.dataFile);
+    },
+
+    removeFolder() {
+      // if (this.dataFile.path == "/uploads"){
+      //   this.dataFile.path == ""
+      // }
+      this.$axios
+        .post("DataFile/deleteFolder", this.dataFile)
+        .then(() => {
+          console.log("Okay");
+          this.getData();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    removeFile() {
+      this.$axios
+        .post("DataFile/deleteFile", this.dataFile)
+        .then(() => {
+          console.log("Okay");
+          this.getData();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    getData() {
+      this.pathFile.path = "/uploads";
+      if (this.$store.state.path == "") {
+        this.pathFile.path = "/uploads";
+      } else {
         this.pathFile.path += "/" + this.$store.state.path;
       }
       // console.log(this.pathFile.path);
       this.$axios
         .post("DataFile/getdata", this.pathFile)
-        .then(response => {
+        .then((response) => {
           this.$store.state.dataFile = response.data;
           //   console.log(this.dataFile);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(error);
         });
     },
-    Test(nameFile,type){
+    openFolder(nameFile, type) {
       // console.log(nameFile,type);
-      if(type == 'Folder'&& this.$store.state.path == ""){
-      this.$store.state.path = nameFile;
-      this.getData();
-      console.log(this.$store.state.path);
-      }
-      else if (type == 'Folder') {
+      if (type == "Folder" && this.$store.state.path == "") {
+        this.$store.state.path = nameFile;
+        this.getData();
+        console.log(this.$store.state.path);
+      } else if (type == "Folder") {
         this.$store.state.path += "/" + nameFile;
         this.getData();
         console.log(this.$store.state.path);
       }
       // console.log(this.$store.state.path);
-    }
+    },
   },
   mounted() {
     // console.log(dataFile);
@@ -107,25 +239,53 @@ export default {
   },
   data() {
     return {
-      pathFile:{
-        path:"/uploads"
-      }
-      // dataFile: [
-      //   {
-      //     iD: null,
-      //     nameFile: "",
-      //     path: "",
-      //     type: "",
-      //     file: "",
-      //     filedata: ""
-      //   }
-      // ]
+      pathPhoto: "",
+      pathFile: {
+        path: "/uploads",
+      },
+      optionsArray1: [
+        {
+          name: "Duplicate",
+          slug: "duplicate",
+        },
+        {
+          type: "divider",
+        },
+        {
+          name: "Edit",
+          slug: "edit",
+        },
+        {
+          name: "<em>Delete</em>",
+          slug: "delete",
+        },
+      ],
+      dataFile: [
+        {
+          iD: null,
+          nameFile: "",
+          path: "",
+          type: "",
+          file: "",
+          filedata: "",
+        },
+      ],
     };
-  }
+  },
 };
 </script>
 
 <style>
+@import "~vue-context/dist/css/vue-context.css";
+
+.Active {
+  display: inline-block !important;
+}
+.OnClickMenu {
+  border: 1px solid black;
+  position: absolute;
+  display: none;
+}
 .Card-Image {
   height: 300px;
   width: 100%;

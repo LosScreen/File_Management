@@ -12,6 +12,8 @@ namespace backEnd.Models
         public string Path { get; set; }
         public string Type { get; set; }
         public dynamic File { get; set; }
+        
+        public string wwwPath { get; set; }
         public System.Collections.Generic.List<IFormFile> filedata { get; set; }
 
     }

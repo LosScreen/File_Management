@@ -60,6 +60,8 @@ namespace backEnd
 
             app.UseAuthorization();
 
+            app.UseStaticFiles();  
+
             app.UseCors();
 
             app.UseEndpoints(endpoints =>

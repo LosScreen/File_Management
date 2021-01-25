@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 
 namespace backEnd.Models
 {
@@ -6,6 +7,7 @@ namespace backEnd.Models
     {
         public string msg { get; set; }
         public object data { get; set; }
+        public string test { get; set; }
 
         public List<DataFile> listdata { get; set; }
     }

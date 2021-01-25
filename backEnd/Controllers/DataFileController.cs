@@ -19,6 +19,9 @@ using System.Net.Http.Headers;
 using System.Net;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Hosting;
+using System.Text;
+using System.IO.Compression;
 
 namespace backEnd.Controllers
 {
@@ -27,7 +30,7 @@ namespace backEnd.Controllers
     public class DataFileController : ControllerBase
     {
         private readonly ILogger<DataFileController> _logger;
-        
+
 
         public DataFileController(ILogger<DataFileController> logger)
         {
@@ -41,49 +44,87 @@ namespace backEnd.Controllers
             DataFile data = new DataFile();
             var db = new ConMySQL();
             List<DataFile> list_result = new List<DataFile>();
-            try{
-            // string sql = $"SELECT * FROM DataFile";
-            string sql = string.Format("SELECT * FROM DataFile WHERE Path = '{0}'", datafile.Path);
-            Console.WriteLine(sql);
-            DataTable SqlDataSet = db.getData(sql);
-            
-            foreach(DataRow dr in SqlDataSet.Rows){
-                DataFile obj = new DataFile();
-                obj.Id = Convert.ToInt32(dr["id"]);
-                obj.NameFile = dr["namefile"].ToString();
-                obj.Path = dr["path"].ToString();
-                obj.Type = dr["type"].ToString();
-                list_result.Add(obj);
+            try
+            {
+                // string sql = $"SELECT * FROM DataFile";
+                string sql = string.Format("SELECT * FROM DataFile WHERE Path = '{0}'", datafile.Path);
+                // Console.WriteLine(sql);
+                DataTable SqlDataSet = db.getData(sql);
+
+                foreach (DataRow dr in SqlDataSet.Rows)
+                {
+                    DataFile obj = new DataFile();
+                    obj.Id = Convert.ToInt32(dr["id"]);
+                    obj.NameFile = dr["namefile"].ToString();
+                    obj.Path = dr["path"].ToString();
+                    obj.Type = dr["type"].ToString();
+                    obj.wwwPath = dr["wwwpath"].ToString();
+                    list_result.Add(obj);
+                }
             }
-            }catch(Exception ex){
+            catch (Exception ex)
+            {
                 res.msg = ex.Message;
                 res.listdata = list_result;
                 Console.WriteLine(res);
             }
-            
+
             // Console.WriteLine(JsonConvert.SerializeObject(list_result, Formatting.Indented));
-            
+
             return list_result;
         }
 
         [HttpPost]
+        [Route("GetPhoto")]
+        public IActionResult GetPhoto([FromBody] DataFile datafile)
+        {
+            ResponseErr res = new ResponseErr();
+            try
+            {
+
+                static string Convert(string path)
+                {
+                    return path.Replace(@"D:\Orisma\File_Management\File_Management\backEnd\wwwroot", @"http://localhost:5000").Replace('\\', '/');
+                }
+                // string filename = "/uploads/Duck.png";
+                // string path = Path.GetFullPath(filename);
+                // string urlFolder = new Uri(path).AbsoluteUri;
+                // Console.WriteLine(urlFolder);
+                string url = Convert(@"D:\Orisma\File_Management\File_Management\backEnd\wwwroot" + datafile.Path + "/" + datafile.NameFile);
+
+                return Ok(url);
+            }
+            catch (Exception ex)
+            {
+                res.msg = ex.Message;
+                // res.test = url;
+                return BadRequest(res);
+            }
+
+        }
+
+        [HttpPost]
         [Route("post")]
-        public IEnumerable<ActionResult<ResponseErr>> PostDataFile([FromBody] DataFile datafile)
+        public IActionResult PostDataFile([FromBody] DataFile datafile)
         {
             // int test = 3;
 
             ResponseErr res = new ResponseErr();
-            try{
+            try
+            {
                 var db = new ConMySQL();
                 string sql = $"INSERT INTO DataFile(NameFile, Path, Type) VALUES ('{datafile.NameFile}','{datafile.Path}', '{datafile.Type}')";
                 db.executeQuery(sql);
                 res.msg = "okay";
-            }catch(Exception ex){
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
                 res.msg = ex.Message;
                 res.data = datafile;
                 // return res;
+                return BadRequest(res);
             }
-                yield return res;
         }
 
         [HttpDelete]
@@ -91,12 +132,15 @@ namespace backEnd.Controllers
         public IEnumerable<ActionResult<ResponseErr>> DeleteDataFile([FromBody] DataFile datafile)
         {
             ResponseErr res = new ResponseErr();
-            try{
+            try
+            {
                 var db = new ConMySQL();
                 string sql = $"Delete From datafile Where ID = {datafile.Id}";
                 db.delete(sql);
                 res.msg = "okay";
-            }catch(Exception ex){
+            }
+            catch (Exception ex)
+            {
                 res.msg = ex.Message;
                 res.data = datafile.Id;
             }
@@ -105,15 +149,18 @@ namespace backEnd.Controllers
 
         [HttpPatch]
         [Route("update/{Id}")]
-        public IEnumerable<ActionResult<ResponseErr>> UpdateDataFile([FromBody] DataFile datafile,int Id)
+        public IEnumerable<ActionResult<ResponseErr>> UpdateDataFile([FromBody] DataFile datafile, int Id)
         {
             ResponseErr res = new ResponseErr();
-            try{
+            try
+            {
                 var db = new ConMySQL();
                 string sql = $"UPDATE datafile SET NameFile='{datafile.NameFile}',Path='{datafile.Path}',Type='{datafile.Type}' WHERE Id='{Id}'";
                 db.executeQuery(sql);
                 res.msg = "okay";
-            }catch(Exception ex){
+            }
+            catch (Exception ex)
+            {
                 res.msg = ex.Message;
                 res.data = datafile.Id;
             }
@@ -128,7 +175,8 @@ namespace backEnd.Controllers
             // rs.filedata_0 = Newtonsoft.Json.JsonConvert.SerializeObject(datafile.filedata[0]);
             Console.WriteLine(datafile.filedata.Count);
             ResponseErr res = new ResponseErr();
-            try{
+            try
+            {
                 var db = new ConMySQL();
                 BinaryReader br = new BinaryReader(datafile.filedata[0].OpenReadStream());
                 int Type = 1;
@@ -136,7 +184,9 @@ namespace backEnd.Controllers
                 string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File) VALUES ('{datafile.filedata[0].FileName}','{datafile.Path}', '{Type}', '{datafile.filedata[0].ContentType}')";
                 db.executeQuery(sql);
                 res.msg = "okay";
-            }catch(Exception ex){
+            }
+            catch (Exception ex)
+            {
                 res.msg = ex.ToString();
                 res.data = datafile.Id;
             }
@@ -148,66 +198,100 @@ namespace backEnd.Controllers
         public async Task<ResponseErr> UploadDataFile2([FromForm] DataFile datafile)
         {
             ResponseErr res = new ResponseErr();
-            try{
+            try
+            {
                 string type = null;
                 string path = null;
-                string uploads= null;
+                string uploads = null;
                 var db = new ConMySQL();
-                if(datafile.Path != "root"){
-                    uploads = Path.Combine(@"FolderData", "uploads"+"/"+datafile.Path);
-                }else{
-                    uploads = Path.Combine(@"FolderData", "uploads");
+                if (datafile.Path != null)
+                {
+                    uploads = Path.Combine(@"wwwroot", "uploads" + "/" + datafile.Path);
+                    // Console.WriteLine(uploads);
                 }
-                Console.WriteLine(datafile.filedata);
+                else
+                {
+                    uploads = Path.Combine(@"wwwroot", "uploads");
+                }
+                // Console.WriteLine(datafile.filedata);
                 foreach (IFormFile file in datafile.filedata)
                 {
-                    if (file.Length > 0) 
+                    if (file.Length > 0)
                     {
                         string filePath = Path.Combine(uploads, file.FileName);
-                        using (Stream fileStream = new FileStream(filePath, FileMode.Create)) {
-                        await file.CopyToAsync(fileStream);
+                        using (Stream fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(fileStream);
                         }
                         // Console.WriteLine(file.ContentType.Contains("image"));
                         if (file.ContentType.StartsWith("image"))
                         {
-                            Console.WriteLine(datafile.Path);
-                            if(datafile.Path == "root"){
-                                path = "/uploads" ;
+                            // Console.WriteLine(datafile.Path);
+                            if (datafile.Path == null)
+                            {
+                                path = "/uploads";
                             }
-                            else if (datafile.Path != ""){
+                            else if (datafile.Path != null)
+                            {
                                 path = "/uploads/" + datafile.Path;
                             }
+                            string wwwPath = "http://localhost:5000/" + path + "/" + file.FileName;
                             type = "image";
-                            string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File) VALUES ('{file.FileName}','{path}', 'image', '{file.ContentType}')";
-                            db.executeQuery(sql);
-                        }else if (file.ContentType.StartsWith("application"))
-                        {
-                            if(datafile.Path != ""){
-                            path = "/uploads/" + datafile.Path;
-                            }
-                            else{
-                                path = "/uploads" ;
-                            }
-                            type = "application";
-                            string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File) VALUES ('{file.FileName}','{path}', 'application', '{file.ContentType}')";
-                            db.executeQuery(sql);
-                        }else{
-                            if(datafile.Path != ""){
-                            path = "/uploads/" + datafile.Path;
-                            }
-                            else{
-                                path = "/uploads" ;
-                            }
-                            type = "unknow";
-                            string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File) VALUES ('{file.FileName}','{path}', 'application', '{file.ContentType}')";
+                            string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File, wwwPath) VALUES ('{file.FileName}','{path}', '{type}', '{file.ContentType}', '{wwwPath}')";
                             db.executeQuery(sql);
                         }
-                        
+                        else if (file.ContentType.StartsWith("application"))
+                        {
+                            if (datafile.Path == null)
+                            {
+                                path = "/uploads";
+                            }
+                            else if (datafile.Path != null)
+                            {
+                                path = "/uploads/" + datafile.Path;
+                            }
+                            string wwwPath = "http://localhost:5000/" + path + "/" + file.FileName;
+                            type = "application";
+                            string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File, wwwPath) VALUES ('{file.FileName}','{path}', '{type}', '{file.ContentType}', '{wwwPath}')";
+                            db.executeQuery(sql);
+                        }
+                        else if (file.ContentType.StartsWith("video"))
+                        {
+                           if (datafile.Path == null)
+                            {
+                                path = "/uploads";
+                            }
+                            else if (datafile.Path != null)
+                            {
+                                path = "/uploads/" + datafile.Path;
+                            }
+                            string wwwPath = "http://localhost:5000/" + path + "/" + file.FileName;
+                            type = "video";
+                            string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File, wwwPath) VALUES ('{file.FileName}','{path}', '{type}', '{file.ContentType}', '{wwwPath}')";
+                            db.executeQuery(sql);
+                        }
+                        else
+                        {
+                           if (datafile.Path == null)
+                            {
+                                path = "/uploads";
+                            }
+                            else if (datafile.Path != null)
+                            {
+                                path = "/uploads/" + datafile.Path;
+                            }
+                            type = "unknow";
+                            string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File) VALUES ('{file.FileName}','{path}', '{type}', '{file.ContentType}')";
+                            db.executeQuery(sql);
+                        }
+
                     }
                 }
                 res.msg = "okay";
                 return res;
-            }catch(Exception ex){
+            }
+            catch (Exception ex)
+            {
                 res.msg = ex.Message;
                 res.data = datafile.Id;
                 return res;
@@ -216,17 +300,28 @@ namespace backEnd.Controllers
 
         [HttpGet]
         [Route("download/{nameFile}")]
-        public FileResult downloadFile([FromQuery] DataFile datafile, string nameFile)
+        public IActionResult downloadFile([FromQuery] string path, string nameFile)
         {
+            // FileResult
             string startupPath = Environment.CurrentDirectory;
-            Console.WriteLine(startupPath);
+            // Console.WriteLine(startupPath);
+            ResponseErr res = new ResponseErr();
             // return File(@"/FolderData/uploads/duck.png", "image/png", "duck.png");
-            
-            IFileProvider provider = new PhysicalFileProvider(startupPath +"/FolderData/uploads" + datafile.Path);
-            IFileInfo fileInfo = provider.GetFileInfo(nameFile);
-            var readStream = fileInfo.CreateReadStream();
-            var mimeType = "image/png";
-            return File(readStream, mimeType, nameFile);
+            // +"/wwwroot" + datafile.Path
+            try
+            {
+                IFileProvider provider = new PhysicalFileProvider(startupPath + "/wwwroot" + path);
+                IFileInfo fileInfo = provider.GetFileInfo(nameFile);
+                var readStream = fileInfo.CreateReadStream();
+                var mimeType = "image/png";
+                return File(readStream, mimeType, nameFile);
+            }
+            catch (Exception ex)
+            {
+                res.msg = ex.Message;
+
+                return BadRequest(res);
+            }
         }
 
         [HttpPost]
@@ -237,24 +332,24 @@ namespace backEnd.Controllers
             var db = new ConMySQL();
             // Console.WriteLine(startupPath);
             ResponseErr res = new ResponseErr();
-            string path = startupPath+"/FolderData" + datafile.Path +"/" + datafile.NameFile;
+            string path = startupPath + "/wwwroot" + datafile.Path + "/" + datafile.NameFile;
             Console.WriteLine(path);
             try
-        {
-            Directory.CreateDirectory(path);
-            Console.WriteLine("The directory was created successfully at {0}.", Directory.GetCreationTime(path));
-            res.msg = "okay";
-            string sql = $"INSERT INTO DataFile(NameFile, Path, Type) VALUES ('{datafile.NameFile}','{datafile.Path}', 'Folder')";
-            db.executeQuery(sql);
-            return res;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("The process failed: {0}", e.ToString());
-            res.msg = e.Message;
-            return res;
+            {
+                Directory.CreateDirectory(path);
+                Console.WriteLine("The directory was created successfully at {0}.", Directory.GetCreationTime(path));
+                res.msg = "okay";
+                string sql = $"INSERT INTO DataFile(NameFile, Path, Type) VALUES ('{datafile.NameFile}','{datafile.Path}', 'Folder')";
+                db.executeQuery(sql);
+                return res;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("The process failed: {0}", e.ToString());
+                res.msg = e.Message;
+                return res;
 
-        }
+            }
         }
 
         [HttpPost]
@@ -264,108 +359,158 @@ namespace backEnd.Controllers
             string startupPath = Environment.CurrentDirectory;
             // Console.WriteLine(startupPath);
             ResponseErr res = new ResponseErr();
-            string path = startupPath + "/FolderData/uploads" + datafile.Path;
-            string pathdel = "/uploads" + datafile.Path;
+            // + datafile.Path + "/" + datafile.NameFile
+            string path = startupPath + "/wwwroot" + datafile.Path + "/" + datafile.NameFile;
+            string pathdel = datafile.Path + "/" + datafile.NameFile;
             // Console.WriteLine(path);
             System.IO.DirectoryInfo di = new DirectoryInfo(path);
 
             var db = new ConMySQL();
             try
-        {
-
-           foreach (FileInfo file in di.GetFiles())
             {
-               file.Delete(); 
+
+                foreach (FileInfo file in di.GetFiles())
+                {
+                    file.Delete();
+                }
+                foreach (DirectoryInfo dir in di.GetDirectories())
+                {
+                    dir.Delete(true);
+                }
+
+                string sql = $"Delete From datafile Where Path like '{pathdel}%'";
+                db.delete(sql);
+                Console.WriteLine(sql);
+
+                string sqlId = $"Delete From datafile Where ID = {datafile.Id}";
+                db.delete(sqlId);
+
+                Directory.Delete(path);
+                Console.WriteLine("The directory was delete successfully at {0}.", Directory.GetCreationTime(path));
+                res.msg = "okay";
+                return res;
             }
-            foreach (DirectoryInfo dir in di.GetDirectories())
-            {   
-                dir.Delete(true); 
+            catch (Exception e)
+            {
+                Console.WriteLine("The process failed: {0}", e.ToString());
+                res.msg = e.Message;
+                return res;
+
+                // Directory.Delete(subPath);
             }
-
-            string sql = $"Delete From datafile Where Path like '{pathdel}%'";
-            db.delete(sql);
-
-            string sqlId = $"Delete From datafile Where ID = {datafile.Id}";
-            db.delete(sqlId);
-
-            Directory.Delete(path);
-            Console.WriteLine("The directory was delete successfully at {0}.", Directory.GetCreationTime(path));
-            res.msg = "okay";
-            return res;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("The process failed: {0}", e.ToString());
-            res.msg = e.Message;
-            return res;
-
-            // Directory.Delete(subPath);
-        }
         }
 
         [HttpPost]
         [Route("deleteFile")]
         public ResponseErr deleteFile([FromBody] DataFile datafile)
         {
+            var db = new ConMySQL();
             string startupPath = Environment.CurrentDirectory;
             // Console.WriteLine(startupPath);
             ResponseErr res = new ResponseErr();
             // + "FolderData" + datafile.Path + datafile.NameFile
-            try{
-                var fileInfo = new System.IO.FileInfo(startupPath + "/FolderData" + datafile.Path + datafile.NameFile);
-                    fileInfo.Delete();
+            try
+            {
+                var fileInfo = new System.IO.FileInfo(startupPath + "/wwwroot" + datafile.Path + "/" + datafile.NameFile);
+                fileInfo.Delete();
+                string sqlId = $"Delete From datafile Where ID = {datafile.Id}";
+                db.delete(sqlId);
                 res.msg = "Okay";
                 return res;
-            }catch(Exception e){
+            }
+            catch (Exception e)
+            {
                 res.msg = e.Message;
                 return res;
             }
         }
 
+        [HttpGet]
+        [Route("downloadFolderZip/{nameFile}")]
+        public IActionResult downloadFolderZip([FromQuery] string path, string nameFile)
+        {
+            string startupPath = Environment.CurrentDirectory;
+            string startPath = startupPath + "/wwwroot" + path + "/" + nameFile;
+            string zipPath = startupPath + "/FolderData/uploads/" + nameFile + ".zip";
 
+            ZipFile.CreateFromDirectory(startPath, zipPath);
 
+            // IFileProvider provider = new PhysicalFileProvider(startupPath + "/FolderData/uploads");
+            // IFileInfo fileInfo = provider.GetFileInfo(nameFile  + ".zip");
+            // var readStream = fileInfo.CreateReadStream();
+            // var mimeType = "application/zip";
+            // var eiei = File(readStream, mimeType, nameFile+ ".zip");
 
-        // public async Task<ResponseErr> DownloadDataFileAsync()
-        // {
-        //     ResponseErr res = new ResponseErr();
-        //     var client = new HttpClient();
-        //     var response = await client.GetAsync("http://localhost:5000/backEnd/FolderData/uploads/duck.png");
+            //     HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+            // response.Content = new StreamContent(new FileStream(startupPath + "/FolderData/uploads/"+ nameFile  + ".zip", FileMode.Open, FileAccess.Read));
+            // response.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment");
+            // response.Content.Headers.ContentDisposition.FileName = nameFile  + ".zip";
+            // response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/zip");
 
-        //     using (var stream = await response.Content.ReadAsStreamAsync())
-        // {
-        //     var fileInfo = new FileInfo("duckA.png");
-        //     using (var fileStream = fileInfo.OpenWrite())
-        //     {
-        //         await stream.CopyToAsync(fileStream);
-        //     }
-        // }
-        // return res;
-        // }
+            
 
+            byte[] bytes;
+            using (FileStream file = new FileStream(startupPath + "/FolderData/uploads/"+ nameFile  + ".zip", FileMode.Open, FileAccess.Read))
+            {
+                bytes = new byte[file.Length];
+                file.Read(bytes, 0, (int)file.Length);
+            }
+            var fileInfodelete = new System.IO.FileInfo(startupPath + "/FolderData/uploads/" + nameFile + ".zip");
+            fileInfodelete.Delete();
+            return new FileContentResult(bytes,"application/zip"){
+                FileDownloadName = nameFile  + ".zip"
+            };
 
+            // var fileInfodelete = new System.IO.FileInfo(startupPath + "/FolderData/uploads/" + nameFile + ".zip");
+            // fileInfodelete.Delete();
 
-
-        // public HttpResponseMessage DownloadDataFile(string fileName)
-        // {
-        //     var fileDownloadName = "duck.pnga";
-
-        //     // Build the file contents.
-        //     var fileContents = "FolderData/uploads";
-
-        //     // Set the headers to indicate we are returning a file.
-        //     var downloadContent = new StringContent(fileContents);
-        //     downloadContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-        //     downloadContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-        //     {
-        //         FileName = fileDownloadName
-        //     };
-
-        //     // Respond with the file.
-        //     return new HttpResponseMessage(HttpStatusCode.OK)
-        //     {
-        //         Content = downloadContent
-        //     };
-        // }
+            // ;       return Ok();
+        }
     }
 
+
+
+
+    // public async Task<ResponseErr> DownloadDataFileAsync()
+    // {
+    //     ResponseErr res = new ResponseErr();
+    //     var client = new HttpClient();
+    //     var response = await client.GetAsync("http://localhost:5000/backEnd/FolderData/uploads/duck.png");
+
+    //     using (var stream = await response.Content.ReadAsStreamAsync())
+    // {
+    //     var fileInfo = new FileInfo("duckA.png");
+    //     using (var fileStream = fileInfo.OpenWrite())
+    //     {
+    //         await stream.CopyToAsync(fileStream);
+    //     }
+    // }
+    // return res;
+    // }
+
+
+
+
+    // public HttpResponseMessage DownloadDataFile(string fileName)
+    // {
+    //     var fileDownloadName = "duck.pnga";
+
+    //     // Build the file contents.
+    //     var fileContents = "FolderData/uploads";
+
+    //     // Set the headers to indicate we are returning a file.
+    //     var downloadContent = new StringContent(fileContents);
+    //     downloadContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+    //     downloadContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+    //     {
+    //         FileName = fileDownloadName
+    //     };
+
+    //     // Respond with the file.
+    //     return new HttpResponseMessage(HttpStatusCode.OK)
+    //     {
+    //         Content = downloadContent
+    //     };
+    // }
 }
+
