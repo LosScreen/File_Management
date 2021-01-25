@@ -10,7 +10,8 @@ export default new Vuex.Store({
       {
 
       }
-    ]
+    ],
+    directory: ["Home/"]
   },
   mutations: {},
   actions: {},

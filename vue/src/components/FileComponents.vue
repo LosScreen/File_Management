@@ -92,11 +92,17 @@
           >Open</a
         >
       </li>
-      <li v-if="dataFile.type != 'Folder'">
-        <a href="#" @click.prevent="downloadFile(dataFile)">Downloads</a>
+      <li v-if="dataFile.type == 'Folder'">
+        <a href="#" @click.prevent="downloadFolder(dataFile)">Downloads</a>
       </li>
       <li v-if="dataFile.type == 'Folder'">
         <a href="#" @click.prevent="removeFolder()">Remove Folder</a>
+      </li>
+      <li v-if="dataFile.type != 'Folder'">
+        <a href="#" @click.prevent="Preview(dataFile.wwwPath)">Open</a>
+      </li>
+      <li v-if="dataFile.type != 'Folder'">
+        <a href="#" @click.prevent="downloadFile(dataFile)">Downloads</a>
       </li>
       <li v-if="dataFile.type != 'Folder'">
         <a href="#" @click.prevent="removeFile()">Remove File</a>
@@ -130,12 +136,33 @@ export default {
     //   ],
   },
   methods: {
+    logDirectory(data){
+      if(this.$store.state.directory.length > 1){
+      this.$store.state.directory.push("/" + data);
+      }
+      else{
+        this.$store.state.directory.push(data);
+      }
+    },
+    downloadFolder(data) {
+      this.dataFile = data;
+      const str = this.dataFile.nameFile + "?path=" + this.dataFile.path;
+      const FileDownload = require("js-file-download");
+      this.$axios
+        .get("DataFile/downloadFolderZip/" + str, { responseType: "blob" })
+        .then((response) => {
+          FileDownload(response.data, this.dataFile.nameFile + ".zip");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
     downloadFile(data) {
       this.dataFile = data;
       const str = this.dataFile.nameFile + "?path=" + this.dataFile.path;
       const FileDownload = require("js-file-download");
-       this.$axios
-        .get("DataFile/download/"+str,  {responseType: 'blob'})
+      this.$axios
+        .get("DataFile/download/" + str, { responseType: "blob" })
         // responseType: 'blob'
         .then((response) => {
           FileDownload(response.data, this.dataFile.nameFile);
@@ -150,7 +177,7 @@ export default {
     },
     getPhoto(data) {
       this.dataFile = data;
-      console.log(data);
+      // console.log(data);
       if (this.dataFile.type == "image") {
         this.$axios
           .post("DataFile/GetPhoto", this.dataFile)
@@ -172,7 +199,8 @@ export default {
     },
     logFile(data) {
       this.dataFile = data;
-      console.log(this.dataFile);
+      // this.$store.state.directory.push("eiei");
+      // console.log(this.dataFile);
     },
 
     removeFolder() {
@@ -221,14 +249,15 @@ export default {
     },
     openFolder(nameFile, type) {
       // console.log(nameFile,type);
+      this.logDirectory(nameFile);
       if (type == "Folder" && this.$store.state.path == "") {
         this.$store.state.path = nameFile;
         this.getData();
-        console.log(this.$store.state.path);
+        // console.log(this.$store.state.path);
       } else if (type == "Folder") {
         this.$store.state.path += "/" + nameFile;
         this.getData();
-        console.log(this.$store.state.path);
+        // console.log(this.$store.state.path);
       }
       // console.log(this.$store.state.path);
     },
@@ -243,23 +272,6 @@ export default {
       pathFile: {
         path: "/uploads",
       },
-      optionsArray1: [
-        {
-          name: "Duplicate",
-          slug: "duplicate",
-        },
-        {
-          type: "divider",
-        },
-        {
-          name: "Edit",
-          slug: "edit",
-        },
-        {
-          name: "<em>Delete</em>",
-          slug: "delete",
-        },
-      ],
       dataFile: [
         {
           iD: null,

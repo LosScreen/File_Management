@@ -7,7 +7,7 @@ namespace backEnd.Service
     public class ConMySQL
     {
         // root1234
-        private string _conectionString = "server=127.0.0.1;user=root;password=;database=FileMDB";
+        private string _conectionString = "server=127.0.0.1;user=root;password=root1234;database=FileMDB";
         private MySqlConnection _conn;
 
         public ConMySQL()

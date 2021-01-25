@@ -1,5 +1,6 @@
 <template>
   <div class="container-fluid">
+      <Directory />
     <div class="row" style="">
       <div class="col-2" style="background-color: red">
         <ul
@@ -21,10 +22,10 @@
           :Type="item.type" -->
         <FileComponents> </FileComponents>
       </div>
-      <button v-on:click="getData()">AAAAA</button>
+      <!-- <button v-on:click="getData()">AAAAA</button>
       <p v-for="(item, inx) in $store.state.dataFile" :key="inx">
         {{ item.nameFile }}
-      </p>
+      </p> -->
     </div>
   </div>
 </template>
@@ -32,26 +33,27 @@
 <script>
 import Menu from "@/components/Menu.vue";
 import FileComponents from "@/components/FileComponents.vue";
+import Directory from "@/components/DirectoryComponents.vue";
 
 export default {
   components: {
     Menu,
-    FileComponents
+    FileComponents,
+    Directory,
   },
   methods: {
     getData() {
-      this.pathFile.path = "/uploads"
+      this.pathFile.path = "/uploads";
       // console.log(this.$axios);
-     if(this.$store.state.path == ""){
+      if (this.$store.state.path == "") {
         this.pathFile.path = "/uploads";
-      }
-      else{
+      } else {
         this.pathFile.path += "/" + this.$store.state.path;
       }
       console.log(this.pathFile);
       this.$axios
         .post("DataFile/getdata", this.pathFile)
-        .then(response => {
+        .then((response) => {
           this.$store.state.dataFile = response.data;
           // console.log(this.$store.state.dataFile)
           // console.log(this.$store.state.dataFile);
@@ -67,14 +69,14 @@ export default {
           // console.log(response);
           // console.log(response.data[0].nameFile);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(error);
         });
     },
 
     onClock(value) {
       this.dataFile.push({ nameFile: value });
-    }
+    },
   },
   mounted() {
     this.getData();
@@ -83,8 +85,8 @@ export default {
 
   data() {
     return {
-      pathFile:{
-        path:"/uploads",
+      pathFile: {
+        path: "/uploads",
       },
       // dataFile: [
       //   {
@@ -98,14 +100,14 @@ export default {
       // ],
       nameMenu: [
         {
-          Name_Menu: "New Folder"
+          Name_Menu: "New Folder",
         },
         {
-          Name_Menu: "Uploads"
-        }
-      ]
+          Name_Menu: "Uploads",
+        },
+      ],
     };
-  }
+  },
   // watch:{
   //   value(){
   //     this.name_Folder = this.name_Fo

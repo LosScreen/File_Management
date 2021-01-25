@@ -467,50 +467,5 @@ namespace backEnd.Controllers
             // ;       return Ok();
         }
     }
-
-
-
-
-    // public async Task<ResponseErr> DownloadDataFileAsync()
-    // {
-    //     ResponseErr res = new ResponseErr();
-    //     var client = new HttpClient();
-    //     var response = await client.GetAsync("http://localhost:5000/backEnd/FolderData/uploads/duck.png");
-
-    //     using (var stream = await response.Content.ReadAsStreamAsync())
-    // {
-    //     var fileInfo = new FileInfo("duckA.png");
-    //     using (var fileStream = fileInfo.OpenWrite())
-    //     {
-    //         await stream.CopyToAsync(fileStream);
-    //     }
-    // }
-    // return res;
-    // }
-
-
-
-
-    // public HttpResponseMessage DownloadDataFile(string fileName)
-    // {
-    //     var fileDownloadName = "duck.pnga";
-
-    //     // Build the file contents.
-    //     var fileContents = "FolderData/uploads";
-
-    //     // Set the headers to indicate we are returning a file.
-    //     var downloadContent = new StringContent(fileContents);
-    //     downloadContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-    //     downloadContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-    //     {
-    //         FileName = fileDownloadName
-    //     };
-
-    //     // Respond with the file.
-    //     return new HttpResponseMessage(HttpStatusCode.OK)
-    //     {
-    //         Content = downloadContent
-    //     };
-    // }
 }
 
