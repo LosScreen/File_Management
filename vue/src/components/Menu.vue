@@ -1,30 +1,14 @@
 <template>
-  <div>
+  <div class="">
     <div v-if="name_Menu == 'New Folder'">
-      <li
-        class="button"
-        style="
-          height: 50px;
-          text-align: center;
-          padding: 15px 0px 25px 0px;
-          margin-bottom: 10px;
-        "
-        @click="ModalNewFolder = true"
-      >
+      <li class="button" style="" @click="ModalNewFolder = true">
+        <i class="fas fa-folder-plus"></i>
         {{ name_Menu }}
       </li>
     </div>
     <div v-else-if="name_Menu == 'Uploads'">
-      <li
-        class="button"
-        style="
-          height: 50px;
-          text-align: center;
-          padding: 15px 0px 25px 0px;
-          margin-bottom: 10px;
-        "
-        @click="showModal = true"
-      >
+      <li class="button" style="" @click="showModal = true">
+        <i class="fas fa-plus"></i>
         {{ name_Menu }}
       </li>
     </div>
@@ -59,12 +43,13 @@ export default {
     submitFile() {
       let formData = new FormData();
       formData.append("filedata", this.file);
-      if(this.$store.state.path != ""){
-      formData.append("path", this.$store.state.path);
-      }
-      else if (this.$store.state.path == ""){
+      if (this.$store.state.path != "") {
+        formData.append("path", this.$store.state.path);
+        console.log(this.$store.state.path);
+      } else if (this.$store.state.path == "") {
         formData.append("path", "");
       }
+      console.log(this.$store.state.path);
       // this.fileData.filedata = formData;
       // this.fileData.path = this.$store.state.path;
 
@@ -100,30 +85,31 @@ export default {
       if (this.$store.state.path == "") {
         this.New_Folder.Path = "/uploads";
       } else if (this.$store.state.path != "") {
-        this.New_Folder.Path = "/uploads" + "/" + this.$store.state.path;
+        this.New_Folder.Path = "/uploads" + this.$store.state.path;
       }
       // console.log(this.New_Folder);
-      if(this.$store.state.NameFile != ""){
-      this.$axios
-        .post("DataFile/createfolder", this.New_Folder)
-        .then(() => {
-          this.getData();
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-      }else{
+      if (this.$store.state.NameFile != "") {
+        this.$axios
+          .post("DataFile/createfolder", this.New_Folder)
+          .then(() => {
+            this.getData();
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      } else {
         alert("Name Folder is Null");
       }
     },
     getData() {
-      this.pathFile.path = "/uploads"
+      this.pathFile.path = "/uploads";
       if (this.$store.state.path == "") {
         this.pathFile.path = "/uploads";
       } else {
-        this.pathFile.path +="/" + this.$store.state.path;
-        console.log(this.pathFile.path);
+        this.pathFile.path += this.$store.state.path;
+        // console.log(this.pathFile.path);
       }
+      // this.pathFile.path = "/uploads/asd/dsa";
       // console.log(this.pathFile.path);
       this.$axios
         .post("DataFile/getdata", this.pathFile)
@@ -181,11 +167,15 @@ export default {
   color: #000000;
   border: none;
   cursor: pointer;
-  background-color: rgb(21, 180, 82);
   vertical-align: text-top;
+  height: 40px;
+  text-align: left;
+  border-radius: 0 20px 20px 0;
+  margin-bottom: 10px;
+  padding: 8px 0 0 25px;
 }
 
 .button:hover {
-  background-color: rgb(16, 104, 50);
+  background-color: rgb(236, 236, 236);
 }
 </style>

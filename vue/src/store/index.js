@@ -11,7 +11,9 @@ export default new Vuex.Store({
 
       }
     ],
-    directory: ["Home/"]
+    directory: ["Home"],
+    atDirectory:"",
+    deDirectory:""
   },
   mutations: {},
   actions: {},

@@ -1,10 +1,18 @@
 <template>
-  <div>
+  <div
+    class=""
+    style="
+      display: flex;
+      justify-content: left;
+      height: 50px;
+    "
+  >
     <p
       @click="moveDirectory(inx + 1)"
-      style="display: inline"
+      style="display: inline; margin: auto 3px;"
       v-for="(item, inx) in this.$store.state.directory"
       :key="inx"
+      class="buttonDirectory"
     >
       {{ item }}
     </p>
@@ -26,26 +34,49 @@ export default {
         // console.log(j);
       }
       this.$store.state.path = "";
-      this.pathDirectory = "/uploads/";
-      // console.log(cnt)
-      for (var i = 1; i < cnt; i++) {
-        this.pathDirectory += this.$store.state.directory[i];
-        this.$store.state.path += this.$store.state.directory[i];
+      this.pathDirectory = "/uploads";
+      // console.log(this.$store.state.directory)
+      for (var i = 0; i < cnt; i++) {
+        this.pathDirectory += this.$store.state.directory[i].replace(
+          "Home",
+          ""
+        );
+        this.$store.state.path += this.$store.state.directory[i].replace(
+          "Home",
+          ""
+        );
         // console.log(item)
       }
+
+      // console.log(this.$store.state.directory.length);
+      if (this.$store.state.directory.length > 1) {
+        this.$router.push(
+          "/MyDrive/" +
+            encodeURIComponent(this.pathDirectory.replace("/uploads", ""))
+        );
+      } else if (this.$store.state.directory.length == 0) {
+        this.$router.push("/MyDrive");
+      }
+      // console.log(this.pathDirectory)
       // this.$store.state.path = this.pathDirectory;
       this.getData();
-    //   console.log(this.pathDirectory);
+      //   console.log(this.pathDirectory);
     },
     getData() {
-    //   console.log(this.pathDirectory);
+      //   console.log(this.pathDirectory);
       this.pathFile.path = "/uploads";
-      if (this.pathDirectory == "/uploads/") {
+      if (this.pathDirectory == "/uploads") {
         this.pathFile.path = "/uploads";
+        this.$router.push("/MyDrive/");
       } else {
         // console.log(this.pathDirectory);
-        this.pathFile.path = this.pathDirectory;
         // console.log(this.pathFile.path);
+        this.pathFile.path = this.pathDirectory;
+        // this.$router.push("/MyDrive/" + encodeURIComponent(this.pathDirectory.replace("/uploads", "")));
+        // console.log(encodeURIComponent(this.pathDirectory.replace("/uploads/", "")));
+        // console.log(decodeURIComponent(this.pathDirectory.replace("/uploads/", "")));
+        // console.log(this.pathFile.path);
+        //  this.pathFile.path = "/uploads/asd"
       }
       this.$axios
         .post("DataFile/getdata", this.pathFile)
@@ -80,4 +111,16 @@ export default {
 </script>
 
 <style>
+.buttonDirectory {
+  cursor: pointer;
+  padding: 5px 10px;
+  font-weight: bold;
+  /* font-size: 20px; */
+  /* top: 50% ; */
+}
+.buttonDirectory:hover {
+  /* font-size: 20px; */
+  background-color: rgba(175, 175, 175, 0.575);
+  border-radius:10px;
+}
 </style>

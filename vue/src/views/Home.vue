@@ -1,10 +1,18 @@
 <template>
   <div class="container-fluid">
-      <Directory />
+    <!-- <div class="row" style="">
+      <div class="col" style="">
+        <Directory  />
+      </div>
+      <div class="col" style="text-align: right;">
+        <beforeDirectory />
+      </div>
+    </div> -->
     <div class="row" style="">
-      <div class="col-2" style="background-color: red">
+      <div class="col-2" style="background-color: white; padding: 0 10px 0 0">
         <ul
-          style="list-style-type: none; margin: 0; padding: 12px 0px 12px 0px"
+          class="endLine"
+          style="list-style-type: none; padding: 12px 0px 12px 0px"
         >
           <Menu
             v-for="(item, inx) in nameMenu"
@@ -15,11 +23,19 @@
           </Menu>
         </ul>
       </div>
-      <div class="col" style="background-color: yellow">
+      <div class="col" style="background-color:white">
         <!-- v-for="(item, inx) in dataFile"
           :key="inx"
           :NameFile="item.nameFile"
           :Type="item.type" -->
+        <div class="row" style="">
+          <div class="col" style="border-bottom: rgb(206, 206, 206) 1px solid;">
+            <Directory />
+          </div>
+          <div class="col" style="border-bottom: rgb(206, 206, 206) 1px solid;">
+            <beforeDirectory />
+          </div>
+        </div>
         <FileComponents> </FileComponents>
       </div>
       <!-- <button v-on:click="getData()">AAAAA</button>
@@ -34,23 +50,44 @@
 import Menu from "@/components/Menu.vue";
 import FileComponents from "@/components/FileComponents.vue";
 import Directory from "@/components/DirectoryComponents.vue";
+import beforeDirectory from "@/components/ButtonDirectoryComponents.vue";
 
 export default {
   components: {
     Menu,
     FileComponents,
     Directory,
+    beforeDirectory,
   },
   methods: {
     getData() {
       this.pathFile.path = "/uploads";
       // console.log(this.$axios);
-      if (this.$store.state.path == "") {
+      if (this.$route.params.id == undefined) {
         this.pathFile.path = "/uploads";
       } else {
-        this.pathFile.path += "/" + this.$store.state.path;
+        this.pathFile.path += decodeURIComponent(this.$route.params.id);
+        // console.log(decodeURIComponent(this.$route.params.id));
+        // console.log(this.pathFile.path);
       }
-      console.log(this.pathFile);
+
+      if (this.$route.params.id != undefined) {
+        var str = this.$route.params.id.split("/");
+        var mapstr = str.map((str) => "/" + str);
+        // console.log(this.$route.params.id);
+        // console.log(mapstr);
+
+        // this.$store.state.directory.push(this.$router.id.split("/"))
+        this.$store.state.directory = ["Home"];
+        for (var i = 0; i < mapstr.length - 1; i++) {
+          this.$store.state.directory.push(mapstr[i + 1]);
+          this.$store.state.path += mapstr[i + 1];
+          // console.log(this.$store.state.path);
+        }
+      }
+
+      // console.log(this.$route.params.id);
+      // console.log(this.pathFile.path);
       this.$axios
         .post("DataFile/getdata", this.pathFile)
         .then((response) => {
@@ -78,9 +115,19 @@ export default {
       this.dataFile.push({ nameFile: value });
     },
   },
+  created() {
+    window.onpopstate = function () {
+      console.log("event");
+    };
+  },
   mounted() {
     this.getData();
+    this.$store.state.atDirectory = ["Home/"];
+    // var f = this.getData();
     // console.log(this.dataFile.nameFile);
+    window.onpopstate = function () {
+      location.reload();
+    };
   },
 
   data() {
@@ -115,3 +162,8 @@ export default {
   // }
 };
 </script>
+<style>
+.endLine {
+  border-bottom: rgb(206, 206, 206) 1px solid;
+}
+</style>

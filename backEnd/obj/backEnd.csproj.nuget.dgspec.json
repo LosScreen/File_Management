@@ -1,20 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "/Users/piyapon/Desktop/FileMDB/File_Management/backEnd/backEnd.csproj": {}
+    "D:\\Orisma\\File_Management\\File_Management\\backEnd\\backEnd.csproj": {}
   },
   "projects": {
-    "/Users/piyapon/Desktop/FileMDB/File_Management/backEnd/backEnd.csproj": {
+    "D:\\Orisma\\File_Management\\File_Management\\backEnd\\backEnd.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/piyapon/Desktop/FileMDB/File_Management/backEnd/backEnd.csproj",
+        "projectUniqueName": "D:\\Orisma\\File_Management\\File_Management\\backEnd\\backEnd.csproj",
         "projectName": "backEnd",
-        "projectPath": "/Users/piyapon/Desktop/FileMDB/File_Management/backEnd/backEnd.csproj",
-        "packagesPath": "/Users/piyapon/.nuget/packages/",
-        "outputPath": "/Users/piyapon/Desktop/FileMDB/File_Management/backEnd/obj/",
+        "projectPath": "D:\\Orisma\\File_Management\\File_Management\\backEnd\\backEnd.csproj",
+        "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
+        "outputPath": "D:\\Orisma\\File_Management\\File_Management\\backEnd\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "/Users/piyapon/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\USER\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
@@ -79,7 +82,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.404/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
         }
       }
     }

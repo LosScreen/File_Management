@@ -206,7 +206,7 @@ namespace backEnd.Controllers
                 var db = new ConMySQL();
                 if (datafile.Path != null)
                 {
-                    uploads = Path.Combine(@"wwwroot", "uploads" + "/" + datafile.Path);
+                    uploads = Path.Combine(@"wwwroot", "uploads" + datafile.Path);
                     // Console.WriteLine(uploads);
                 }
                 else
@@ -233,7 +233,7 @@ namespace backEnd.Controllers
                             }
                             else if (datafile.Path != null)
                             {
-                                path = "/uploads/" + datafile.Path;
+                                path = "/uploads" + datafile.Path;
                             }
                             string wwwPath = "http://localhost:5000/" + path + "/" + file.FileName;
                             type = "image";

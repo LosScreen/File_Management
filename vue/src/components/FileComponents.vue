@@ -11,12 +11,14 @@
         style="width: 18rem"
       >
         <img
+          style="border-radius: 20px 20px 0 0"
           v-if="item.type == 'image'"
           class="card-img-top Card-Image mx-auto"
           :src="item.wwwPath"
           alt="Card image cap"
         />
         <img
+          style="border-radius: 20px 20px 0 0"
           v-if="item.type == 'video'"
           class="card-img-top Card-Image mx-auto"
           :src="item.wwwPath"
@@ -30,6 +32,7 @@
           alt="Card image cap"
         /> -->
         <img
+          style="border-radius: 20px 20px 0 0"
           v-if="item.type == 'application'"
           class="card-img-top Card-Image mx-auto"
           src="@/assets/folderIcon/ImageDefault.png"
@@ -37,7 +40,7 @@
         />
         <div class="card-body">
           {{ item.nameFile }}
-          {{ item.type }}
+          <!-- {{ item.type }} -->
         </div>
       </div>
 
@@ -50,6 +53,7 @@
         style="width: 18rem"
       >
         <img
+          style="border-radius: 20px 20px 0 0"
           v-if="item.type == 'Folder'"
           class="card-img-top Card-Image mx-auto"
           src="@/assets/folderIcon/FolderDefault.png"
@@ -57,7 +61,7 @@
         />
         <div class="card-body">
           {{ item.nameFile }}
-          {{ item.type }}
+          <!-- {{ item.type }} -->
         </div>
       </div>
       <!-- <div v-if="item.type == 'Folder'" class="card" style="width: 18rem">
@@ -89,8 +93,8 @@
         <a
           href="#"
           @click.prevent="openFolder(dataFile.nameFile, dataFile.type)"
-          >Open</a
-        >
+          >Open
+        </a>
       </li>
       <li v-if="dataFile.type == 'Folder'">
         <a href="#" @click.prevent="downloadFolder(dataFile)">Downloads</a>
@@ -136,13 +140,33 @@ export default {
     //   ],
   },
   methods: {
-    logDirectory(data){
-      if(this.$store.state.directory.length > 1){
-      this.$store.state.directory.push("/" + data);
+    logDirectory(data) {
+      // console.log(data);
+
+      var str = this.$route.params.id.split("/");
+      // console.log(this.$route.params.id.split("/"));
+      var mapstr = str.map((str) => "/" + str);
+      // console.log(this.$route.params.id);
+      // console.log(mapstr);
+
+      // this.$store.state.directory.push(this.$router.id.split("/"))
+      this.$store.state.directory = ["Home"];
+      for (var i = 1; i < mapstr.length; i++) {
+        this.$store.state.directory.push(mapstr[i]);
       }
-      else{
-        this.$store.state.directory.push(data);
-      }
+      this.$store.state.atDirectory = "/" + data;
+      // console.log(this.$store.state.directory);
+
+      // if (this.$store.state.directory.length > 1) {
+      //   this.$store.state.directory.push("/" + data);
+      //   this.$store.state.atDirectory = "/" + data;
+      //   // console.log(this.$store.state.atDirectory);
+      // } else {
+      //   this.$store.state.directory.push("/" +data);
+      //   this.$store.state.atDirectory = "/" + data;
+      //   // console.log(this.$store.state.atDirectory);
+      // }
+      // this.$router.push('/Test/'+encodeURIComponent(this.$store.state.atDirectory))
     },
     downloadFolder(data) {
       this.dataFile = data;
@@ -231,11 +255,12 @@ export default {
 
     getData() {
       this.pathFile.path = "/uploads";
-      if (this.$store.state.path == "") {
+      if (this.$route.params.id == undefined) {
         this.pathFile.path = "/uploads";
       } else {
-        this.pathFile.path += "/" + this.$store.state.path;
+        this.pathFile.path += decodeURIComponent(this.$route.params.id);
       }
+
       // console.log(this.pathFile.path);
       this.$axios
         .post("DataFile/getdata", this.pathFile)
@@ -249,16 +274,25 @@ export default {
     },
     openFolder(nameFile, type) {
       // console.log(nameFile,type);
-      this.logDirectory(nameFile);
+      // this.logDirectory(nameFile);
+
       if (type == "Folder" && this.$store.state.path == "") {
-        this.$store.state.path = nameFile;
-        this.getData();
+        this.$store.state.path = "/" + nameFile;
+        // this.$router.push("/MyDrive/" + encodeURIComponent(this.$store.state.path));
+        // window.open("http://localhost:8080/MyDrive/"+encodeURIComponent(this.$store.state.path), "_self");
+        // this.getData();
         // console.log(this.$store.state.path);
       } else if (type == "Folder") {
         this.$store.state.path += "/" + nameFile;
-        this.getData();
+        // this.$router.push("/MyDrive/" + encodeURIComponent(this.$store.state.path));
+        // this.getData();
         // console.log(this.$store.state.path);
       }
+      this.$router.push(
+        "/MyDrive/" + encodeURIComponent(this.$store.state.path)
+      );
+      this.logDirectory(nameFile);
+      this.getData();
       // console.log(this.$store.state.path);
     },
   },
@@ -306,10 +340,11 @@ export default {
   margin: 10px 0px;
   cursor: pointer;
   transition: 0.5s;
+  border-radius: 20px;
 }
 .Card-Box:hover {
   background: #ffffff;
-  border-radius: 10px;
+  border-radius: 20px;
   box-shadow: 2px 4px 15px rgba(0, 0, 0, 0.2);
   transition: 0.2s;
   transform: scale(1.02);
