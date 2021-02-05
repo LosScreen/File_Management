@@ -1,5 +1,6 @@
 <template>
   <div class="container-fluid">
+    <Navbar />
     <!-- <div class="row" style="">
       <div class="col" style="">
         <Directory  />
@@ -51,6 +52,7 @@ import Menu from "@/components/Menu.vue";
 import FileComponents from "@/components/FileComponents.vue";
 import Directory from "@/components/DirectoryComponents.vue";
 import beforeDirectory from "@/components/ButtonDirectoryComponents.vue";
+import Navbar from "@/components/NavbarComponents.vue"
 
 export default {
   components: {
@@ -58,6 +60,7 @@ export default {
     FileComponents,
     Directory,
     beforeDirectory,
+    Navbar
   },
   methods: {
     getData() {
