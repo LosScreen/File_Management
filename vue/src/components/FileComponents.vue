@@ -6,7 +6,7 @@
         v-if="item.type != 'Folder'"
         @contextmenu.prevent="$refs.menu.open"
         @click.right="logFile(item)"
-        @click.left="Preview(item.wwwPath)"
+        @click.left="Preview(item.path,item.nameFile,item.idUser)"
         class="card Card-Box"
         style="width: 18rem"
       >
@@ -100,18 +100,32 @@
         <a href="#" @click.prevent="downloadFolder(dataFile)">Downloads</a>
       </li>
       <li v-if="dataFile.type == 'Folder'">
+        <a href="#" @click.prevent="ModalShare = true">Share</a>
+      </li>
+      <li v-if="dataFile.type == 'Folder'">
         <a href="#" @click.prevent="removeFolder()">Remove Folder</a>
       </li>
       <li v-if="dataFile.type != 'Folder'">
-        <a href="#" @click.prevent="Preview(dataFile.wwwPath)">Open</a>
+        <a href="#" @click.prevent="Preview(dataFile.path,dataFile.nameFile)">Open</a>
       </li>
       <li v-if="dataFile.type != 'Folder'">
         <a href="#" @click.prevent="downloadFile(dataFile)">Downloads</a>
       </li>
       <li v-if="dataFile.type != 'Folder'">
+        <a href="#" @click.prevent="ModalShare = true">Share</a>
+      </li>
+      <li v-if="dataFile.type != 'Folder'">
         <a href="#" @click.prevent="removeFile()">Remove File</a>
       </li>
     </vue-context>
+    <Modal v-model="ModalShare" title="My first modal">
+      <label>UserName</label>
+      <input v-model="UserNameShare" /><br />
+      <button v-on:click="Share(dataFile)">Yes</button>
+    </Modal>
+
+
+
   </div>
 </template>
 
@@ -140,6 +154,23 @@ export default {
     //   ],
   },
   methods: {
+    Share(data){
+      console.log(data);
+      console.log(this.UsernameShare);
+      this.$axios
+          .post("DataFile/Share?username="+this.UserNameShare, data ,{
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.Token,
+          },
+        })
+          .then((res) => {
+            console.log(res.data);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+    },
     logDirectory(data) {
       // console.log(data);
 
@@ -183,8 +214,11 @@ export default {
           console.log(error);
         });
     },
-    Preview(data) {
-      window.open(data, "_blank");
+    Preview(dataPath,dataName,id) {
+      console.log(id);
+      var path = dataPath + "/" + dataName;
+      window.open("/Preview/"+encodeURIComponent(path), "_blank");
+      console.log(path);
     },
     getPhoto(data) {
       this.dataFile = data;
@@ -292,6 +326,7 @@ export default {
   },
   data() {
     return {
+      ModalShare: false,
       GetData: {
         path: "",
         iduser: 24,
@@ -309,6 +344,7 @@ export default {
           type: "",
           file: "",
           filedata: "",
+          IdUser: ""
         },
       ],
     };

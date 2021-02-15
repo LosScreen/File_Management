@@ -43,9 +43,9 @@ export default {
     submitFile() {
       let formData = new FormData();
       formData.append("filedata", this.file);
-      formData.append("iduser", localStorage.IdUser);
+      // formData.append("iduser", localStorage.IdUser);
       if (this.$store.state.path != "") {
-        formData.append("path","/"+localStorage.Username + this.$store.state.path);
+        formData.append("path",decodeURIComponent(this.$route.params.id));
         console.log(this.$store.state.path);
       } else if (this.$store.state.path == "") {
         formData.append("path","/"+localStorage.Username);
@@ -92,11 +92,14 @@ export default {
       // console.log(this.$store.state.path);
       if (this.$store.state.path == "") {
         this.New_Folder.Path = "/uploads/"+localStorage.Username;
+        console.log("!");
       } else if (this.$store.state.path != "") {
-        this.New_Folder.Path = "/uploads/"+localStorage.Username + this.$store.state.path;
+        this.New_Folder.Path = "/uploads"+ decodeURIComponent(this.$route.params.id);
+        console.log("2");
       }
-      console.log(this.New_Folder.Path);
+      console.log(this.$store.state.directory);
       if (this.$store.state.NameFile != "") {
+
         this.$axios
           .post("DataFile/createfolder", this.New_Folder, {
           headers: {
