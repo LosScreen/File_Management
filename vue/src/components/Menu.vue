@@ -43,13 +43,18 @@ export default {
     submitFile() {
       let formData = new FormData();
       formData.append("filedata", this.file);
+      formData.append("iduser", localStorage.IdUser);
       if (this.$store.state.path != "") {
-        formData.append("path", this.$store.state.path);
+        formData.append("path","/"+localStorage.Username + this.$store.state.path);
         console.log(this.$store.state.path);
       } else if (this.$store.state.path == "") {
-        formData.append("path", "");
+        formData.append("path","/"+localStorage.Username);
       }
-      console.log(this.$store.state.path);
+      // console.log(formData.path);
+
+      for (var pair of formData.entries()) {
+    console.log(pair[0]+ ', ' + pair[1]); 
+}
       // this.fileData.filedata = formData;
       // this.fileData.path = this.$store.state.path;
 
@@ -57,6 +62,8 @@ export default {
         .post("DataFile/putfile2", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization:
+              "Bearer " + localStorage.Token
           },
           onUploadProgress: function (progressEvent) {
             this.uploadPercentage = parseInt(
@@ -81,16 +88,22 @@ export default {
     },
     createFolderDate() {
       this.New_Folder.NameFile = this.inPutPath;
-      console.log(this.$store.state.path);
+      this.New_Folder.IdUser = localStorage.IdUser;
+      // console.log(this.$store.state.path);
       if (this.$store.state.path == "") {
-        this.New_Folder.Path = "/uploads";
+        this.New_Folder.Path = "/uploads/"+localStorage.Username;
       } else if (this.$store.state.path != "") {
-        this.New_Folder.Path = "/uploads" + this.$store.state.path;
+        this.New_Folder.Path = "/uploads/"+localStorage.Username + this.$store.state.path;
       }
-      // console.log(this.New_Folder);
+      console.log(this.New_Folder.Path);
       if (this.$store.state.NameFile != "") {
         this.$axios
-          .post("DataFile/createfolder", this.New_Folder)
+          .post("DataFile/createfolder", this.New_Folder, {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.Token,
+          },
+        })
           .then(() => {
             this.getData();
           })
@@ -102,17 +115,25 @@ export default {
       }
     },
     getData() {
-      this.pathFile.path = "/uploads";
+      this.GetData.path = "/uploads/"+localStorage.Username;
+      // this.GetData.iduser =localStorage.IdUser;
       if (this.$store.state.path == "") {
-        this.pathFile.path = "/uploads";
+        this.GetData.path = "/uploads/"+localStorage.Username;
       } else {
-        this.pathFile.path += this.$store.state.path;
+        this.GetData.path += this.$store.state.path;
         // console.log(this.pathFile.path);
       }
+      this.GetData.iduser = localStorage.IdUser;
+      console.log(this.GetData);
       // this.pathFile.path = "/uploads/asd/dsa";
       // console.log(this.pathFile.path);
       this.$axios
-        .post("DataFile/getdata", this.pathFile)
+        .post("DataFile/getdata", this.GetData, {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.Token,
+          },
+        })
         .then((response) => {
           this.$store.state.dataFile = response.data;
           //   console.log(this.dataFile);
@@ -135,9 +156,14 @@ export default {
       pathFile: {
         path: "/uploads",
       },
+      GetData:{
+        path: "",
+        iduser: 24,
+      },
       New_Folder: {
         NameFile: "",
         Path: "/",
+        IdUser:null,
       },
       file: "",
       uploadPercentage: 0,

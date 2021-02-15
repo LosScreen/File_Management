@@ -22,6 +22,9 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Hosting;
 using System.Text;
 using System.IO.Compression;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace backEnd.Controllers
 {
@@ -36,9 +39,12 @@ namespace backEnd.Controllers
         {
             _logger = logger;
         }
+
+        [Authorize]
         [HttpPost]
         [Route("getData")]
-        public IEnumerable<DataFile> GetDataFiles([FromBody] DataFile datafile)
+        // IEnumerable<DataFile>
+        public IEnumerable<DataFile> GetDataFiles([FromBody] DataFile GetData)
         {
             ResponseErr res = new ResponseErr();
             DataFile data = new DataFile();
@@ -46,8 +52,22 @@ namespace backEnd.Controllers
             List<DataFile> list_result = new List<DataFile>();
             try
             {
+                Request.Headers.TryGetValue("Authorization", out var token);
+                token = ((string)token).Replace("Bearer ", "");
+                var handler = new JwtSecurityTokenHandler();
+                JwtSecurityToken decodedValue = handler.ReadJwtToken(token);
+                List<Claim> claimsList = decodedValue.Claims.ToList();
+                var id = claimsList.Find(x => x.Type == "unique_name").Value;
+
+                // Console.WriteLine(claimsList);
+
+
+
+
+                // int id = 23;
                 // string sql = $"SELECT * FROM DataFile";
-                string sql = string.Format("SELECT * FROM DataFile WHERE Path = '{0}'", datafile.Path);
+                // string sql = string.Format("SELECT * FROM DataFile WHERE Path = '{0}'and IdUser = '{1}'", datafile.Path, id);
+                string sql = string.Format("SELECT * FROM DataFile WHERE Path = '{0}'and IdUser = '{1}'", GetData.Path, id);
                 // Console.WriteLine(sql);
                 DataTable SqlDataSet = db.getData(sql);
 
@@ -61,12 +81,14 @@ namespace backEnd.Controllers
                     obj.wwwPath = dr["wwwpath"].ToString();
                     list_result.Add(obj);
                 }
+                // return Ok(claimsList);
             }
             catch (Exception ex)
             {
                 res.msg = ex.Message;
                 res.listdata = list_result;
-                Console.WriteLine(res);
+                Console.WriteLine(ex.Message);
+                // return BadRequest();
             }
 
             // Console.WriteLine(JsonConvert.SerializeObject(list_result, Formatting.Indented));
@@ -193,6 +215,7 @@ namespace backEnd.Controllers
             yield return res;
         }
 
+        [Authorize]
         [HttpPost]
         [Route("putfile2")]
         public async Task<ResponseErr> UploadDataFile2([FromForm] DataFile datafile)
@@ -204,6 +227,16 @@ namespace backEnd.Controllers
                 string path = null;
                 string uploads = null;
                 var db = new ConMySQL();
+
+                Request.Headers.TryGetValue("Authorization", out var token);
+                token = ((string)token).Replace("Bearer ", "");
+                var handler = new JwtSecurityTokenHandler();
+                JwtSecurityToken decodedValue = handler.ReadJwtToken(token);
+                List<Claim> claimsList = decodedValue.Claims.ToList();
+                var id = claimsList.Find(x => x.Type == "unique_name").Value;
+
+
+
                 if (datafile.Path != null)
                 {
                     uploads = Path.Combine(@"wwwroot", "uploads" + datafile.Path);
@@ -218,6 +251,7 @@ namespace backEnd.Controllers
                 {
                     if (file.Length > 0)
                     {
+                        // Console.WriteLine(datafile.IdUser);
                         string filePath = Path.Combine(uploads, file.FileName);
                         using (Stream fileStream = new FileStream(filePath, FileMode.Create))
                         {
@@ -226,7 +260,7 @@ namespace backEnd.Controllers
                         // Console.WriteLine(file.ContentType.Contains("image"));
                         if (file.ContentType.StartsWith("image"))
                         {
-                            // Console.WriteLine(datafile.Path);
+                            Console.WriteLine(datafile.Path);
                             if (datafile.Path == null)
                             {
                                 path = "/uploads";
@@ -235,10 +269,13 @@ namespace backEnd.Controllers
                             {
                                 path = "/uploads" + datafile.Path;
                             }
+                            Console.WriteLine(path);
                             string wwwPath = "http://localhost:5000/" + path + "/" + file.FileName;
                             type = "image";
-                            string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File, wwwPath) VALUES ('{file.FileName}','{path}', '{type}', '{file.ContentType}', '{wwwPath}')";
+                            string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File, wwwPath, IdUser) VALUES ('{file.FileName}','{path}', '{type}', '{file.ContentType}', '{wwwPath}', '{id}')";
+                            Console.WriteLine(sql);
                             db.executeQuery(sql);
+                            Console.WriteLine("sql");
                         }
                         else if (file.ContentType.StartsWith("application"))
                         {
@@ -248,40 +285,40 @@ namespace backEnd.Controllers
                             }
                             else if (datafile.Path != null)
                             {
-                                path = "/uploads/" + datafile.Path;
+                                path = "/uploads" + datafile.Path;
                             }
                             string wwwPath = "http://localhost:5000/" + path + "/" + file.FileName;
                             type = "application";
-                            string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File, wwwPath) VALUES ('{file.FileName}','{path}', '{type}', '{file.ContentType}', '{wwwPath}')";
+                            string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File, wwwPath, IdUser) VALUES ('{file.FileName}','{path}', '{type}', '{file.ContentType}', '{wwwPath}', '{id}')";
                             db.executeQuery(sql);
                         }
                         else if (file.ContentType.StartsWith("video"))
                         {
-                           if (datafile.Path == null)
+                            if (datafile.Path == null)
                             {
                                 path = "/uploads";
                             }
                             else if (datafile.Path != null)
                             {
-                                path = "/uploads/" + datafile.Path;
+                                path = "/uploads" + datafile.Path;
                             }
                             string wwwPath = "http://localhost:5000/" + path + "/" + file.FileName;
                             type = "video";
-                            string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File, wwwPath) VALUES ('{file.FileName}','{path}', '{type}', '{file.ContentType}', '{wwwPath}')";
+                            string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File, wwwPath, IdUser) VALUES ('{file.FileName}','{path}', '{type}', '{file.ContentType}', '{wwwPath}', '{id}')";
                             db.executeQuery(sql);
                         }
                         else
                         {
-                           if (datafile.Path == null)
+                            if (datafile.Path == null)
                             {
                                 path = "/uploads";
                             }
                             else if (datafile.Path != null)
                             {
-                                path = "/uploads/" + datafile.Path;
+                                path = "/uploads" + datafile.Path;
                             }
                             type = "unknow";
-                            string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File) VALUES ('{file.FileName}','{path}', '{type}', '{file.ContentType}')";
+                            string sql = $"INSERT INTO DataFile(NameFile, Path, Type, File , IdUser) VALUES ('{file.FileName}','{path}', '{type}', '{file.ContentType}', '{id}')";
                             db.executeQuery(sql);
                         }
 
@@ -324,6 +361,7 @@ namespace backEnd.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         [Route("createFolder")]
         public ResponseErr createFolderDate([FromBody] DataFile datafile)
@@ -332,14 +370,22 @@ namespace backEnd.Controllers
             var db = new ConMySQL();
             // Console.WriteLine(startupPath);
             ResponseErr res = new ResponseErr();
-            string path = startupPath + "/wwwroot" + datafile.Path + "/" + datafile.NameFile;
-            Console.WriteLine(path);
             try
             {
+                Request.Headers.TryGetValue("Authorization", out var token);
+                token = ((string)token).Replace("Bearer ", "");
+                var handler = new JwtSecurityTokenHandler();
+                JwtSecurityToken decodedValue = handler.ReadJwtToken(token);
+                List<Claim> claimsList = decodedValue.Claims.ToList();
+                var id = claimsList.Find(x => x.Type == "unique_name").Value;
+
+
+                string path = startupPath + "/wwwroot" + datafile.Path + "/" + datafile.NameFile;
+                Console.WriteLine(path);
                 Directory.CreateDirectory(path);
-                Console.WriteLine("The directory was created successfully at {0}.", Directory.GetCreationTime(path));
+                // Console.WriteLine("The directory was created successfully at {0}.", Directory.GetCreationTime(path));
                 res.msg = "okay";
-                string sql = $"INSERT INTO DataFile(NameFile, Path, Type) VALUES ('{datafile.NameFile}','{datafile.Path}', 'Folder')";
+                string sql = $"INSERT INTO DataFile(NameFile, Path, Type, IdUser) VALUES ('{datafile.NameFile}','{datafile.Path}', 'Folder', '{id}')";
                 db.executeQuery(sql);
                 return res;
             }
@@ -447,18 +493,19 @@ namespace backEnd.Controllers
             // response.Content.Headers.ContentDisposition.FileName = nameFile  + ".zip";
             // response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/zip");
 
-            
+
 
             byte[] bytes;
-            using (FileStream file = new FileStream(startupPath + "/FolderData/uploads/"+ nameFile  + ".zip", FileMode.Open, FileAccess.Read))
+            using (FileStream file = new FileStream(startupPath + "/FolderData/uploads/" + nameFile + ".zip", FileMode.Open, FileAccess.Read))
             {
                 bytes = new byte[file.Length];
                 file.Read(bytes, 0, (int)file.Length);
             }
             var fileInfodelete = new System.IO.FileInfo(startupPath + "/FolderData/uploads/" + nameFile + ".zip");
             fileInfodelete.Delete();
-            return new FileContentResult(bytes,"application/zip"){
-                FileDownloadName = nameFile  + ".zip"
+            return new FileContentResult(bytes, "application/zip")
+            {
+                FileDownloadName = nameFile + ".zip"
             };
 
             // var fileInfodelete = new System.IO.FileInfo(startupPath + "/FolderData/uploads/" + nameFile + ".zip");

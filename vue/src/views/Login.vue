@@ -21,14 +21,14 @@
               </div>
               <div class="form-group">
                 <input
-                type="password"
+                  type="password"
                   style="margin: 0 0 10px 0"
                   class="form-control"
                   v-model="UserData.passWord"
                   placeholder="Password"
                 />
               </div>
-              <button @click="Register()" class="btn btn-primary btn-lg">
+              <button @click="Login()" class="btn btn-primary btn-lg">
                 Login
               </button>
               <!-- </form> -->
@@ -43,7 +43,7 @@
 <script>
 export default {
   methods: {
-    Register() {
+    Login() {
       if (this.UserData.userName == null) {
         alert("Username is null");
       } else if (this.UserData.passWord == null) {
@@ -56,8 +56,16 @@ export default {
               alert("Username or Password is Not correct");
             } else {
               console.log(res.data);
+              localStorage.Token = res.data.value.token;
+              localStorage.Username = res.data.value.username;
+              console.log(localStorage.Username)
+              this.$router.push(
+                "/MyDrive/" + encodeURIComponent("/"+this.UserData.userName)
+              );
+              // console.log(this.$store.state.User);
+              // console.log(localStorage.Username);
+              // console.log(localStorage.IdUser);
             }
-            //   console.log("res");
           })
           .catch(function (error) {
             console.log(error);

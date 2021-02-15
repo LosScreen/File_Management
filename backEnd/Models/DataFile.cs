@@ -15,6 +15,7 @@ namespace backEnd.Models
         
         public string wwwPath { get; set; }
         public System.Collections.Generic.List<IFormFile> filedata { get; set; }
+        public int IdUser { get; set; }
 
     }
 }

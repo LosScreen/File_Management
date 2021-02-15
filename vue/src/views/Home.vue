@@ -24,16 +24,16 @@
           </Menu>
         </ul>
       </div>
-      <div class="col" style="background-color:white">
+      <div class="col" style="background-color: white">
         <!-- v-for="(item, inx) in dataFile"
           :key="inx"
           :NameFile="item.nameFile"
           :Type="item.type" -->
         <div class="row" style="">
-          <div class="col" style="border-bottom: rgb(206, 206, 206) 1px solid;">
+          <div class="col" style="border-bottom: rgb(206, 206, 206) 1px solid">
             <Directory />
           </div>
-          <div class="col" style="border-bottom: rgb(206, 206, 206) 1px solid;">
+          <div class="col" style="border-bottom: rgb(206, 206, 206) 1px solid">
             <beforeDirectory />
           </div>
         </div>
@@ -52,7 +52,7 @@ import Menu from "@/components/Menu.vue";
 import FileComponents from "@/components/FileComponents.vue";
 import Directory from "@/components/DirectoryComponents.vue";
 import beforeDirectory from "@/components/ButtonDirectoryComponents.vue";
-import Navbar from "@/components/NavbarComponents.vue"
+import Navbar from "@/components/NavbarComponents.vue";
 
 export default {
   components: {
@@ -60,39 +60,47 @@ export default {
     FileComponents,
     Directory,
     beforeDirectory,
-    Navbar
+    Navbar,
   },
   methods: {
     getData() {
-      this.pathFile.path = "/uploads";
+      this.GetData.path = "/uploads";
+      // this.GetData.iduser =localStorage.IdUser;
       // console.log(this.$axios);
       if (this.$route.params.id == undefined) {
-        this.pathFile.path = "/uploads";
+        this.GetData.path = "/uploads";
       } else {
-        this.pathFile.path += decodeURIComponent(this.$route.params.id);
+        this.GetData.path += decodeURIComponent(this.$route.params.id);
         // console.log(decodeURIComponent(this.$route.params.id));
-        // console.log(this.pathFile.path);
+        // console.log(this.GetData.path);
       }
 
-      if (this.$route.params.id != undefined) {
+      if (this.$route.params.id != "/" + localStorage.Username) {
         var str = this.$route.params.id.split("/");
         var mapstr = str.map((str) => "/" + str);
         // console.log(this.$route.params.id);
+        // console.log(localStorage.Username);
         // console.log(mapstr);
 
         // this.$store.state.directory.push(this.$router.id.split("/"))
         this.$store.state.directory = ["Home"];
-        for (var i = 0; i < mapstr.length - 1; i++) {
-          this.$store.state.directory.push(mapstr[i + 1]);
+        for (var i = 0; i < mapstr.length - 2; i++) {
+          this.$store.state.directory.push(mapstr[i + 2]);
           this.$store.state.path += mapstr[i + 1];
           // console.log(this.$store.state.path);
         }
       }
 
       // console.log(this.$route.params.id);
-      // console.log(this.pathFile.path);
+      // console.log(this.GetData.path);
+      // this.pathFile.path = "/uploads/awe";
       this.$axios
-        .post("DataFile/getdata", this.pathFile)
+        .post("DataFile/getdata", this.GetData, {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.Token,
+          },
+        })
         .then((response) => {
           this.$store.state.dataFile = response.data;
           // console.log(this.$store.state.dataFile)
@@ -135,9 +143,15 @@ export default {
 
   data() {
     return {
+      GetData: {
+        path: "",
+        iduser: 24,
+        token: localStorage.token,
+      },
       pathFile: {
         path: "/uploads",
       },
+      id: 23,
       // dataFile: [
       //   {
       //     iD: null,

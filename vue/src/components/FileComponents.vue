@@ -146,27 +146,14 @@ export default {
       var str = this.$route.params.id.split("/");
       // console.log(this.$route.params.id.split("/"));
       var mapstr = str.map((str) => "/" + str);
-      // console.log(this.$route.params.id);
-      // console.log(mapstr);
 
-      // this.$store.state.directory.push(this.$router.id.split("/"))
       this.$store.state.directory = ["Home"];
-      for (var i = 1; i < mapstr.length; i++) {
+      for (var i = 2; i < mapstr.length; i++) {
         this.$store.state.directory.push(mapstr[i]);
       }
       this.$store.state.atDirectory = "/" + data;
-      // console.log(this.$store.state.directory);
-
-      // if (this.$store.state.directory.length > 1) {
-      //   this.$store.state.directory.push("/" + data);
-      //   this.$store.state.atDirectory = "/" + data;
-      //   // console.log(this.$store.state.atDirectory);
-      // } else {
-      //   this.$store.state.directory.push("/" +data);
-      //   this.$store.state.atDirectory = "/" + data;
-      //   // console.log(this.$store.state.atDirectory);
-      // }
-      // this.$router.push('/Test/'+encodeURIComponent(this.$store.state.atDirectory))
+      // console.log(this.$store.state.atDirectory);
+     
     },
     downloadFolder(data) {
       this.dataFile = data;
@@ -254,16 +241,25 @@ export default {
     },
 
     getData() {
-      this.pathFile.path = "/uploads";
+      this.GetData.path = "/uploads";
+      // this.GetData.iduser =localStorage.IdUser;
+      // console.log(this.$axios);
       if (this.$route.params.id == undefined) {
-        this.pathFile.path = "/uploads";
+        this.GetData.path = "/uploads/"+localStorage.Username;
       } else {
-        this.pathFile.path += decodeURIComponent(this.$route.params.id);
+        this.GetData.path += decodeURIComponent(this.$route.params.id);
+        // console.log(decodeURIComponent(this.$route.params.id));
+        // console.log(this.GetData.path);
       }
-
-      // console.log(this.pathFile.path);
+      console.log(this.GetData);
+      // console.log(this.GetData);
       this.$axios
-        .post("DataFile/getdata", this.pathFile)
+        .post("DataFile/getdata", this.GetData, {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.Token,
+          },
+        })
         .then((response) => {
           this.$store.state.dataFile = response.data;
           //   console.log(this.dataFile);
@@ -278,22 +274,16 @@ export default {
 
       if (type == "Folder" && this.$store.state.path == "") {
         this.$store.state.path = "/" + nameFile;
-        // this.$router.push("/MyDrive/" + encodeURIComponent(this.$store.state.path));
         // window.open("http://localhost:8080/MyDrive/"+encodeURIComponent(this.$store.state.path), "_self");
-        // this.getData();
-        // console.log(this.$store.state.path);
       } else if (type == "Folder") {
         this.$store.state.path += "/" + nameFile;
-        // this.$router.push("/MyDrive/" + encodeURIComponent(this.$store.state.path));
-        // this.getData();
-        // console.log(this.$store.state.path);
       }
       this.$router.push(
-        "/MyDrive/" + encodeURIComponent(this.$store.state.path)
+        "/MyDrive/" + encodeURIComponent(this.$route.params.id) + encodeURIComponent("/"+nameFile)
       );
+      // console.log(this.$route.params.id);
       this.logDirectory(nameFile);
       this.getData();
-      // console.log(this.$store.state.path);
     },
   },
   mounted() {
@@ -302,6 +292,11 @@ export default {
   },
   data() {
     return {
+      GetData: {
+        path: "",
+        iduser: 24,
+        token: localStorage.token,
+      },
       pathPhoto: "",
       pathFile: {
         path: "/uploads",

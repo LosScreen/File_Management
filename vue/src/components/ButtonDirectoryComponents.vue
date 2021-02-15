@@ -22,9 +22,10 @@ export default {
         // console.log(this.$store.state.directory);
         this.$store.state.directory.pop();
       }
+      console.log(this.$store.state.directory);
       // console.log(j);
       this.$store.state.path = "";
-      this.pathDirectory = "/uploads";
+      this.pathDirectory = "/uploads/"+localStorage.Username;
       // console.log(cnt)
       // console.log(this.$store.state.directory);
       for (var i = 0; i < this.$store.state.directory.length; i++) {
@@ -49,16 +50,23 @@ export default {
     },
     getData() {
       //   console.log(this.pathDirectory);
-      this.pathFile.path = "/uploads";
-      if (this.pathDirectory == "/uploads") {
-        this.pathFile.path = "/uploads";
+      // this.GetData.iduser = localStorage.IdUser;
+      this.GetData.path = "/uploads/"+localStorage.Username;
+      if (this.pathDirectory == "/uploads/"+localStorage.Username) {
+        this.GetData.path = "/uploads/"+localStorage.Username;
       } else {
         // console.log(this.pathDirectory);
-        this.pathFile.path = this.pathDirectory;
+        this.GetData.path = this.pathDirectory;
         // console.log(this.pathFile.path);
       }
+      console.log(this.GetData.path)
       this.$axios
-        .post("DataFile/getdata", this.pathFile)
+        .post("DataFile/getdata", this.GetData, {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.Token,
+          },
+        })
         .then((response) => {
           this.$store.state.dataFile = response.data;
           //   console.log(this.dataFile);
@@ -70,6 +78,10 @@ export default {
   },
   data() {
     return {
+       GetData:{
+        path: "",
+        iduser: 24,
+      },
       pathDirectory: "",
       pathFile: {
         path: "/uploads",

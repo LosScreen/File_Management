@@ -13,7 +13,11 @@ export default new Vuex.Store({
     ],
     directory: ["Home"],
     atDirectory:"",
-    deDirectory:""
+    deDirectory:"",
+    User:{
+      id:null,
+      username:null,
+    },
   },
   mutations: {},
   actions: {},
