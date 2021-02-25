@@ -326,6 +326,7 @@ export default {
   },
   data() {
     return {
+      UserNameShare:"",
       ModalShare: false,
       GetData: {
         path: "",

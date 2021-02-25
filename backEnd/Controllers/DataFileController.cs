@@ -462,8 +462,12 @@ namespace backEnd.Controllers
             {
                 var fileInfo = new System.IO.FileInfo(startupPath + "/wwwroot" + datafile.Path + "/" + datafile.NameFile);
                 fileInfo.Delete();
+                db.Open();
                 string sqlId = $"Delete From datafile Where ID = {datafile.Id}";
-                db.delete(sqlId);
+                db.execute(sqlId);
+                string sqlsup = $"Delete From datafile Where MainFolder = {datafile.Id}";
+                db.execute(sqlId);
+                db.Close(); 
                 res.msg = "Okay";
                 return res;
             }
@@ -553,6 +557,7 @@ namespace backEnd.Controllers
                 // Console.WriteLine("1");
                 foreach (DataRow dr in SqlDataSet.Rows)
                     {
+                        obj.Id = Convert.ToInt32(dr["id"]);
                         obj.NameFile = dr["namefile"].ToString();
                         obj.Path = dr["path"].ToString();
                         obj.Type = dr["type"].ToString();
@@ -563,8 +568,9 @@ namespace backEnd.Controllers
                 // Console.WriteLine("2");
                 db.Close();
                     if(obj.NameFile != null){
-                        string sqlShare = $"INSERT INTO DataFile(NameFile, Path, Type, wwwPath, IdUser, Share) VALUES ('{obj.NameFile}','{obj.Path}', '{obj.Type}', '{obj.wwwPath}', '{obj.IdUser}', '{objUser.id}')";
+                        string sqlShare = $"INSERT INTO DataFile(NameFile, Path, Type, wwwPath, IdUser, Share, MainFolder) VALUES ('{obj.NameFile}','{obj.Path}', '{obj.Type}', '{obj.wwwPath}', '{obj.IdUser}', '{objUser.id}',{obj.Id})";
                         db.executeQuery(sqlShare);
+                        Console.WriteLine(sqlShare);
                     }
 
                 return Ok("Eiei");
@@ -587,6 +593,7 @@ namespace backEnd.Controllers
                 foreach (DataRow dr in SqlDataFolder.Rows)
                     {
                         DataFile obj = new DataFile();
+                        obj.Id = Convert.ToInt32(dr["id"]);
                         obj.NameFile = dr["namefile"].ToString();
                         obj.Path = dr["path"].ToString();
                         obj.Type = dr["type"].ToString();
@@ -601,6 +608,7 @@ namespace backEnd.Controllers
                 foreach (DataRow dr in SqlDataSet.Rows)
                     {
                         DataFile obj = new DataFile();
+                        obj.Id = Convert.ToInt32(dr["id"]);
                         obj.NameFile = dr["namefile"].ToString();
                         obj.Path = dr["path"].ToString();
                         obj.Type = dr["type"].ToString();
@@ -614,7 +622,7 @@ namespace backEnd.Controllers
                     foreach (DataFile item in list_result)
                     {
                         Console.WriteLine(item.NameFile);
-                        string sqlShare = $"INSERT INTO DataFile(NameFile, Path, Type, wwwPath, IdUser, Share) VALUES ('{item.NameFile}','{item.Path}', '{item.Type}', '{item.wwwPath}', '{item.IdUser}', '{objUser.id}')";
+                        string sqlShare = $"INSERT INTO DataFile(NameFile, Path, Type, wwwPath, IdUser, Share, MainFolder) VALUES ('{item.NameFile}','{item.Path}', '{item.Type}', '{item.wwwPath}', '{item.IdUser}', '{objUser.id}',{item.Id})";
                         db.execute(sqlShare);
                     }
                     }

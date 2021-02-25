@@ -12,6 +12,19 @@
         {{ name_Menu }}
       </li>
     </div>
+    <div v-if="name_Menu == 'Share'">
+      <li class="button" style="" @click="ShareLink">
+        <i class="fas fa-folder-plus"></i>
+        {{ name_Menu }}
+      </li>
+    </div>
+    <div v-if="name_Menu == 'My Drive'">
+      <li class="button" style="" @click="MyDrive">
+        <i class="fas fa-folder-plus"></i>
+        {{ name_Menu }}
+      </li>
+    </div>
+    
 
     <Modal v-model="ModalNewFolder" title="My first modal">
       <label>Name Folder</label>
@@ -40,6 +53,12 @@
 export default {
   components: {},
   methods: {
+    MyDrive(){
+      this.$router.push("/MyDrive/" +encodeURIComponent("/"+localStorage.Username));
+    },
+    ShareLink(){
+      this.$router.push("/Share/");
+    },
     submitFile() {
       let formData = new FormData();
       formData.append("filedata", this.file);
@@ -88,7 +107,7 @@ export default {
     },
     createFolderDate() {
       this.New_Folder.NameFile = this.inPutPath;
-      this.New_Folder.IdUser = localStorage.IdUser;
+      // this.New_Folder.IdUser = localStorage.IdUser;
       // console.log(this.$store.state.path);
       if (this.$store.state.path == "") {
         this.New_Folder.Path = "/uploads/"+localStorage.Username;
@@ -126,7 +145,6 @@ export default {
         this.GetData.path += this.$store.state.path;
         // console.log(this.pathFile.path);
       }
-      this.GetData.iduser = localStorage.IdUser;
       console.log(this.GetData);
       // this.pathFile.path = "/uploads/asd/dsa";
       // console.log(this.pathFile.path);
@@ -153,6 +171,10 @@ export default {
   },
   data() {
     return {
+      Testdata:{
+        NameFile: "Test",
+        Path: "/uploads/asd",
+      },
       showModal: false,
       ModalNewFolder: false,
       inPutPath: "",
@@ -166,7 +188,6 @@ export default {
       New_Folder: {
         NameFile: "",
         Path: "/",
-        IdUser:null,
       },
       file: "",
       uploadPercentage: 0,

@@ -65,6 +65,7 @@ export default {
   methods: {
     getData() {
       this.GetData.path = "/uploads";
+      console.log("response");
       // this.GetData.iduser =localStorage.IdUser;
       // console.log(this.$axios);
       if (this.$route.params.id == undefined) {
@@ -119,6 +120,7 @@ export default {
         })
         .catch((error) => {
           console.error(error);
+          console.log("error");
         });
     },
 
@@ -132,6 +134,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.state.dataFile == null;
     this.getData();
     this.$store.state.atDirectory = ["Home/"];
     // var f = this.getData();
@@ -169,6 +172,9 @@ export default {
         {
           Name_Menu: "Uploads",
         },
+        {
+          Name_Menu: "Share"
+        }
       ],
     };
   },

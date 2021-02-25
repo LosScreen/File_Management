@@ -215,5 +215,25 @@ namespace backEnd.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        [HttpPost]
+        [Route("GetUser")]
+        public IActionResult GetUser([FromBody] User data){
+            try{
+            var db = new ConMySQL();
+            string sqlUser = string.Format("SELECT * FROM User WHERE id = '{0}'", data.id);
+            DataTable SqlData = db.get(sqlUser);
+            User objUser = new User();
+                foreach (DataRow dr in SqlData.Rows)
+                    {
+                        objUser.userName = dr["username"].ToString();
+                    }
+                return Ok(objUser);
+            } catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+
+            }
+        }
+
     }
 }

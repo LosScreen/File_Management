@@ -67,5 +67,40 @@ namespace backEnd.Controllers
             }
         }
         
+        [Authorize]
+        [HttpPost]
+        [Route("GetPhotoShare")]
+        public IActionResult GetPhotoShare (DataFile data){
+            var db = new ConMySQL();
+            try
+            {
+                Request.Headers.TryGetValue("Authorization", out var token);
+                token = ((string)token).Replace("Bearer ", "");
+                var handler = new JwtSecurityTokenHandler();
+                JwtSecurityToken decodedValue = handler.ReadJwtToken(token);
+                List<Claim> claimsList = decodedValue.Claims.ToList();
+                var id = claimsList.Find(x => x.Type == "unique_name").Value;
+
+                
+
+                string sql = string.Format("SELECT * FROM DataFile WHERE wwwPath like '%{0}'and Share = '{1}'", data.Path, id);
+                DataTable SqlDataSet = db.getData(sql);
+                Console.WriteLine(sql);
+
+                DataFile obj = new DataFile();
+                foreach (DataRow dr in SqlDataSet.Rows)
+                {
+                    obj.wwwPath = dr["wwwpath"].ToString();
+                }
+
+                return Ok(obj);
+            }
+            catch (Exception ex)
+            {
+                
+                return BadRequest(ex.Message);
+            }
+        }
+        
     }
 }

@@ -4,6 +4,8 @@ import Home from "../views/Home.vue";
 import Register from "../views/Register.vue";
 import Login from "../views/Login.vue";
 import Photo from "../views/Photo.vue";
+import PhotoShare from "../views/Share/PhotoShare.vue";
+import Share from "../views/Share.vue";
 
 Vue.use(VueRouter);
 
@@ -37,6 +39,16 @@ const routes = [
     path: "/Preview/:path?",
     name: "Preview",
     component: Photo
+  },
+  {
+    path: "/Share/:id?",
+    name: "Share",
+    component: Share
+  },
+  {
+    path: "/PreviewShare/:path?",
+    name: "PreviewShare",
+    component: PhotoShare
   }
 ];
 
