@@ -106,6 +106,10 @@ export default {
       this.$emit("AnClock", this.name_log);
     },
     createFolderDate() {
+      this.$store.state.dataFile.forEach(data => {
+        console.log(data.nameFile);
+      });
+      console.log(this.$store.state.dataFile);
       this.New_Folder.NameFile = this.inPutPath;
       // this.New_Folder.IdUser = localStorage.IdUser;
       // console.log(this.$store.state.path);

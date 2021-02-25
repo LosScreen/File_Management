@@ -158,8 +158,13 @@ namespace backEnd.Controllers
             try
             {
                 var db = new ConMySQL();
+                db.Open();
                 string sql = $"Delete From datafile Where ID = {datafile.Id}";
-                db.delete(sql);
+                db.execute(sql);
+                string sqlshare = $"Delete From datafile Where MainFolder = {datafile.Id}";
+                db.execute(sqlshare);
+
+                db.Close();
                 res.msg = "okay";
             }
             catch (Exception ex)
@@ -401,10 +406,19 @@ namespace backEnd.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         [Route("deleteFolder")]
         public ResponseErr deleteFolder([FromBody] DataFile datafile)
         {
+             Request.Headers.TryGetValue("Authorization", out var token);
+                token = ((string)token).Replace("Bearer ", "");
+                var handler = new JwtSecurityTokenHandler();
+                JwtSecurityToken decodedValue = handler.ReadJwtToken(token);
+                List<Claim> claimsList = decodedValue.Claims.ToList();
+                var id = claimsList.Find(x => x.Type == "unique_name").Value;
+
+
             string startupPath = Environment.CurrentDirectory;
             // Console.WriteLine(startupPath);
             ResponseErr res = new ResponseErr();
@@ -426,13 +440,16 @@ namespace backEnd.Controllers
                 {
                     dir.Delete(true);
                 }
-
-                string sql = $"Delete From datafile Where Path like '{pathdel}%'";
+                //  and IdUser = '{id}'
+                string sql = $"Delete From datafile Where Path like '{pathdel}%' and IdUser = '{id}'";
                 db.delete(sql);
                 Console.WriteLine(sql);
 
                 string sqlId = $"Delete From datafile Where ID = {datafile.Id}";
                 db.delete(sqlId);
+
+                string sqlSup = $"Delete From datafile Where MainFolder = {datafile.Id}";
+                db.delete(sqlSup);
 
                 Directory.Delete(path);
                 Console.WriteLine("The directory was delete successfully at {0}.", Directory.GetCreationTime(path));
@@ -466,7 +483,7 @@ namespace backEnd.Controllers
                 string sqlId = $"Delete From datafile Where ID = {datafile.Id}";
                 db.execute(sqlId);
                 string sqlsup = $"Delete From datafile Where MainFolder = {datafile.Id}";
-                db.execute(sqlId);
+                db.execute(sqlsup);
                 db.Close(); 
                 res.msg = "Okay";
                 return res;
@@ -528,6 +545,9 @@ namespace backEnd.Controllers
             var db = new ConMySQL();
             db.Open();
 
+                            int test = 0;
+
+
             Request.Headers.TryGetValue("Authorization", out var token);
                 token = ((string)token).Replace("Bearer ", "");
                 var handler = new JwtSecurityTokenHandler();
@@ -536,6 +556,7 @@ namespace backEnd.Controllers
                 var id = claimsList.Find(x => x.Type == "unique_name").Value;
             try
             {
+                // Console.WriteLine(data.Type);
                 if(data.Type != "Folder"){
                 
                 string sqlUser = string.Format("SELECT * FROM User WHERE UserName = '{0}'", username);
@@ -546,7 +567,7 @@ namespace backEnd.Controllers
                         objUser.id = Convert.ToInt32(dr["id"]);
                     }
 
-                // Console.WriteLine(data.NameFile);
+                Console.WriteLine(objUser.id);
                 // Console.WriteLine(data.Path);
                 // Console.WriteLine(id);
                 string sql = string.Format("SELECT * FROM DataFile WHERE NameFile = '{0}'and Path = '{1}' and IdUser = {2} and Share = '0'", data.NameFile, data.Path, id);
@@ -576,8 +597,15 @@ namespace backEnd.Controllers
                 return Ok("Eiei");
                 }
                 // Console.WriteLine(.Length);
+
+
+
+
+
+
                 else if(data.Type == "Folder")
                 {
+                    
                 string sqlUser = string.Format("SELECT * FROM User WHERE UserName = '{0}'", username);
                 DataTable SqlData = db.get(sqlUser);
                 User objUser = new User();
@@ -585,8 +613,51 @@ namespace backEnd.Controllers
                     {
                         objUser.id = Convert.ToInt32(dr["id"]);
                     }
+
+                Console.WriteLine(objUser.id);
+                if(objUser.id != 0){
                 List<DataFile> list_result = new List<DataFile>();
 
+                string sql = string.Format("SELECT * FROM DataFile WHERE NameFile = '{0}'and Path = '{1}' and IdUser = '{2}' and Share = '{3}'", data.NameFile, data.Path, id, objUser.id);
+                Console.WriteLine(sql);
+                DataTable SqlDataSet = db.get(sql);
+                foreach (DataRow dr in SqlDataSet.Rows)
+                    {
+                        DataFile obj = new DataFile();
+                        obj.Id = Convert.ToInt32(dr["id"]);
+                        obj.NameFile = dr["namefile"].ToString();
+                        obj.Path = dr["path"].ToString();
+                        obj.Type = dr["type"].ToString();
+                        obj.File = dr["file"].ToString();
+                        obj.wwwPath = dr["wwwpath"].ToString();
+                        obj.IdUser = Convert.ToInt32(dr["iduser"]);
+                        obj.MainFolder = Convert.ToInt32(dr["mainfolder"]);
+                        list_result.Add(obj);
+                    }
+
+                    string sqlD = string.Format("SELECT * FROM DataFile WHERE Path like '{0}%' and IdUser = {1} and Share = '{2}' ", data.Path+"/"+data.NameFile, id, objUser.id);
+                    Console.WriteLine(sqlD);
+                DataTable SqlDataSetA = db.get(sqlD);
+                foreach (DataRow dr in SqlDataSetA.Rows)
+                    {
+                        DataFile obj = new DataFile();
+                        obj.Id = Convert.ToInt32(dr["id"]);
+                        obj.NameFile = dr["namefile"].ToString();
+                        obj.Path = dr["path"].ToString();
+                        obj.Type = dr["type"].ToString();
+                        obj.File = dr["file"].ToString();
+                        obj.wwwPath = dr["wwwpath"].ToString();
+                        obj.IdUser = Convert.ToInt32(dr["iduser"]);
+                        obj.MainFolder = Convert.ToInt32(dr["mainfolder"]);
+                        list_result.Add(obj);
+                    }
+                    
+                if(list_result.Count == 0){
+                        Console.WriteLine("0");
+                        Console.WriteLine(list_result.Count);
+
+
+                List<DataFile> list_resultA = new List<DataFile>();
                 string sqlFolder = string.Format("SELECT * FROM DataFile WHERE NameFile = '{0}'and Path = '{1}' and IdUser = {2} and Share = '0'", data.NameFile, data.Path, id);
                 DataTable SqlDataFolder = db.get(sqlFolder);
                 // Console.WriteLine(SqlDataFolder.Length);
@@ -600,12 +671,13 @@ namespace backEnd.Controllers
                         obj.File = dr["file"].ToString();
                         obj.wwwPath = dr["wwwpath"].ToString();
                         obj.IdUser = Convert.ToInt32(dr["iduser"]);
-                        list_result.Add(obj);
+                        obj.MainFolder = Convert.ToInt32(dr["mainfolder"]);
+                        list_resultA.Add(obj);
                     }
 
-                string sql = string.Format("SELECT * FROM DataFile WHERE Path like '{0}%' and IdUser = {1} and Share = '0'", data.Path+"/"+data.NameFile, id);
-                DataTable SqlDataSet = db.get(sql);
-                foreach (DataRow dr in SqlDataSet.Rows)
+                string sqlC = string.Format("SELECT * FROM DataFile WHERE Path like '{0}%' and IdUser = {1} and Share = '0'", data.Path+"/"+data.NameFile, id);
+                DataTable SqlDataSetC = db.get(sqlC);
+                foreach (DataRow dr in SqlDataSetC.Rows)
                     {
                         DataFile obj = new DataFile();
                         obj.Id = Convert.ToInt32(dr["id"]);
@@ -615,13 +687,14 @@ namespace backEnd.Controllers
                         obj.File = dr["file"].ToString();
                         obj.wwwPath = dr["wwwpath"].ToString();
                         obj.IdUser = Convert.ToInt32(dr["iduser"]);
-                        list_result.Add(obj);
+                        obj.MainFolder = Convert.ToInt32(dr["mainfolder"]);
+                        list_resultA.Add(obj);
                     }
 
                 if(SqlDataFolder != null){
-                    foreach (DataFile item in list_result)
+                    foreach (DataFile item in list_resultA)
                     {
-                        Console.WriteLine(item.NameFile);
+                        // Console.WriteLine(item.NameFile);
                         string sqlShare = $"INSERT INTO DataFile(NameFile, Path, Type, wwwPath, IdUser, Share, MainFolder) VALUES ('{item.NameFile}','{item.Path}', '{item.Type}', '{item.wwwPath}', '{item.IdUser}', '{objUser.id}',{item.Id})";
                         db.execute(sqlShare);
                     }
@@ -638,16 +711,156 @@ namespace backEnd.Controllers
                 //     obj.wwwPath = dr["wwwpath"].ToString();
                 //     list_result.Add(obj);
                 // }
-                return Ok(list_result);
+                return Ok(list_resultA);
                 }
-                return Ok();
+                else if (list_result.Count > 0){
+
+                List<DataFile> list_resultB = new List<DataFile>();
+                string sqlFolder = string.Format("SELECT * FROM DataFile WHERE NameFile = '{0}'and Path = '{1}' and IdUser = {2} and Share = '0'", data.NameFile, data.Path, id);
+                Console.WriteLine(sqlFolder);
+                DataTable SqlDataFolder = db.get(sqlFolder);
+                // return Ok(SqlDataFolder);
+                // Console.WriteLine(SqlDataFolder.Length);
+                foreach (DataRow dr in SqlDataFolder.Rows)
+                    {
+                        DataFile obj = new DataFile();
+                        obj.Id = Convert.ToInt32(dr["id"]);
+                        obj.NameFile = dr["namefile"].ToString();
+                        obj.Path = dr["path"].ToString();
+                        obj.Type = dr["type"].ToString();
+                        obj.File = dr["file"].ToString();
+                        obj.wwwPath = dr["wwwpath"].ToString();
+                        obj.IdUser = Convert.ToInt32(dr["iduser"]);
+                        obj.MainFolder = Convert.ToInt32(dr["mainfolder"]);
+                        list_resultB.Add(obj);
+                        // Console.WriteLine("========");
+                    }
+
+
+
+                string sqlA = string.Format("SELECT * FROM DataFile WHERE Path like '{0}%' and IdUser = {1} and Share = '0'", data.Path+"/"+data.NameFile, id);
+                Console.WriteLine(sqlA);
+                DataTable SqlDataSetB = db.get(sqlA);
+                foreach (DataRow dr in SqlDataSetB.Rows)
+                    {
+                        DataFile obj = new DataFile();
+                        obj.Id = Convert.ToInt32(dr["id"]);
+                        obj.NameFile = dr["namefile"].ToString();
+                        obj.Path = dr["path"].ToString();
+                        obj.Type = dr["type"].ToString();
+                        obj.File = dr["file"].ToString();
+                        obj.wwwPath = dr["wwwpath"].ToString();
+                        obj.IdUser = Convert.ToInt32(dr["iduser"]);
+                        obj.MainFolder = Convert.ToInt32(dr["mainfolder"]);
+                        list_resultB.Add(obj);
+                    }
+
+                                    List<DataFile> list_ = new List<DataFile>();
+
+                    // Console.WriteLine(list_resultB.Count);
+                    // return Ok(list_result);
+                    foreach (var itemA in list_resultB)
+                    {
+                        int x = 0;
+                        foreach (var itemB in list_result)
+                        {
+                            // Console.WriteLine(itemA.Id);
+                            // Console.WriteLine(itemB.MainFolder);
+                            if(itemA.Id == itemB.MainFolder){
+                                x = 1;
+                            }
+                        }
+                        if(x != 1){
+                        string sqlShare = $"INSERT INTO DataFile(NameFile, Path, Type, wwwPath, IdUser, Share, MainFolder) VALUES ('{itemA.NameFile}','{itemA.Path}', '{itemA.Type}', '{itemA.wwwPath}', '{itemA.IdUser}', '{objUser.id}',{itemA.Id})";
+                        db.execute(sqlShare);
+                        }
+                    }
+        
+                }
+                }else{
+                    return Ok("ไม่มี User นี้");
+                }
+                // Console.WriteLine("Endline");
+                db.Close();
+                
+                }return Ok();
             }
             catch (Exception ex)
             {
-                
                 return BadRequest(ex.Message);
             }
         }
+
+        // [Authorize]
+        // [HttpPost]
+        // [Route("CheckShare")]
+        // public IActionResult CheckShare([FromBody] DataFile data,[FromQuery]string username){
+        //     var db = new ConMySQL();
+        //         db.Open();
+
+        //         Request.Headers.TryGetValue("Authorization", out var token);
+        //         token = ((string)token).Replace("Bearer ", "");
+        //         var handler = new JwtSecurityTokenHandler();
+        //         JwtSecurityToken decodedValue = handler.ReadJwtToken(token);
+        //         List<Claim> claimsList = decodedValue.Claims.ToList();
+        //         var id = claimsList.Find(x => x.Type == "unique_name").Value;
+
+        //     try{
+       
+                
+        //         string sqlUser = string.Format("SELECT * FROM User WHERE UserName = '{0}'", username);
+        //         DataTable SqlData = db.get(sqlUser);
+        //         User objUser = new User();
+        //         foreach (DataRow dr in SqlData.Rows)
+        //             {
+        //                 objUser.id = Convert.ToInt32(dr["id"]);
+        //             }
+
+        //         List<DataFile> list_result = new List<DataFile>();
+
+        //         string sql = string.Format("SELECT * FROM DataFile WHERE NameFile = '{0}'and Path = '{1}' and IdUser = '{2}' and Share = '{3}'", data.NameFile, data.Path, id, objUser.id);
+        //         Console.WriteLine(sql);
+        //         DataTable SqlDataSet = db.get(sql);
+        //         foreach (DataRow dr in SqlDataSet.Rows)
+        //             {
+        //                 DataFile obj = new DataFile();
+        //                 obj.Id = Convert.ToInt32(dr["id"]);
+        //                 obj.NameFile = dr["namefile"].ToString();
+        //                 obj.Path = dr["path"].ToString();
+        //                 obj.Type = dr["type"].ToString();
+        //                 obj.File = dr["file"].ToString();
+        //                 obj.wwwPath = dr["wwwpath"].ToString();
+        //                 obj.IdUser = Convert.ToInt32(dr["iduser"]);
+        //                 list_result.Add(obj);
+        //             }
+
+        //             string sql = string.Format("SELECT * FROM DataFile WHERE Path like '{0}%' and IdUser = {1} and Share = '{2}' ", data.Path+"/"+data.NameFile, id, objUser.id);
+        //         DataTable SqlDataSetA = db.get(sql);
+        //         foreach (DataRow dr in SqlDataSetA.Rows)
+        //             {
+        //                 DataFile obj = new DataFile();
+        //                 obj.Id = Convert.ToInt32(dr["id"]);
+        //                 obj.NameFile = dr["namefile"].ToString();
+        //                 obj.Path = dr["path"].ToString();
+        //                 obj.Type = dr["type"].ToString();
+        //                 obj.File = dr["file"].ToString();
+        //                 obj.wwwPath = dr["wwwpath"].ToString();
+        //                 obj.IdUser = Convert.ToInt32(dr["iduser"]);
+        //                 list_result.Add(obj);
+        //             }
+        //         if(list_result.Count == 0){
+
+        //             return Ok("Good Share");
+
+        //         }else if (list_result > 0){
+        //             return Ok(list_result.Count);
+        //         }
+        //         return BadRequest("Bad");
+        //     }catch (Exception ex){
+        //         return BadRequest(ex.Message);
+        //     }
+
+        // }
     }
 }
 

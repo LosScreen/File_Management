@@ -157,6 +157,7 @@ export default {
     Share(data){
       console.log(data);
       console.log(this.UsernameShare);
+      if(localStorage.Username != this.UserNameShare){
       this.$axios
           .post("DataFile/Share?username="+this.UserNameShare, data ,{
           headers: {
@@ -166,10 +167,14 @@ export default {
         })
           .then((res) => {
             console.log(res.data);
+            console.log(res);
           })
           .catch((error) => {
             console.log(error);
           });
+      }else{
+        alert("ชื่อ User ตัวเองจ้าาา");
+      }
     },
     logDirectory(data) {
       // console.log(data);
@@ -253,7 +258,12 @@ export default {
       //   this.dataFile.path == ""
       // }
       this.$axios
-        .post("DataFile/deleteFolder", this.dataFile)
+        .post("DataFile/deleteFolder", this.dataFile, {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.Token,
+          },
+        })
         .then(() => {
           console.log("Okay");
           this.getData();
@@ -264,7 +274,12 @@ export default {
     },
     removeFile() {
       this.$axios
-        .post("DataFile/deleteFile", this.dataFile)
+        .post("DataFile/deleteFile", this.dataFile, {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.Token,
+          },
+        })
         .then(() => {
           console.log("Okay");
           this.getData();
