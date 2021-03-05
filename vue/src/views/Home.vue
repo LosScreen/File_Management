@@ -134,6 +134,11 @@ export default {
     };
   },
   mounted() {
+    console.log(this.$store.state.dataFile)
+    if(localStorage.Token == ""){
+      this.$router.push("/login");
+    }
+    else if (localStorage.Token != null) {
     this.$store.state.dataFile == null;
     this.getData();
     this.$store.state.atDirectory = ["Home/"];
@@ -142,6 +147,7 @@ export default {
     window.onpopstate = function () {
       location.reload();
     };
+    }
   },
 
   data() {

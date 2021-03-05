@@ -7,7 +7,7 @@
       </li>
     </div>
     <div v-else-if="name_Menu == 'Uploads'">
-      <li class="button" style="" @click="showModal = true">
+      <li class="button" style="" @click="Upload = true">
         <i class="fas fa-plus"></i>
         {{ name_Menu }}
       </li>
@@ -31,7 +31,7 @@
       <input v-model="inPutPath" /><br />
       <button v-on:click="createFolderDate()">Yes</button>
     </Modal>
-    <Modal v-model="showModal" title="My first modal">
+    <Modal v-model="Upload" title="My first modal">
       <label
         >File
         <input
@@ -60,6 +60,8 @@ export default {
       this.$router.push("/Share/");
     },
     submitFile() {
+      // console.log(this.$store.state.dataFile.filter(item => item.nameFile == this.$refs.file.files[0].name).length);
+      if (this.$store.state.dataFile.filter(item => item.nameFile == this.$refs.file.files[0].name).length == 0){
       let formData = new FormData();
       formData.append("filedata", this.file);
       // formData.append("iduser", localStorage.IdUser);
@@ -93,19 +95,28 @@ export default {
         .then(() => {
           this.getData();
           console.log("SUCCESS!!");
+          this.Upload = false;
         })
         .catch(function (error) {
           console.log(error);
         });
+        }else if (this.$store.state.dataFile.filter(item => item.nameFile == this.$refs.file.files[0].name).length != 0){
+          alert("อัพโหลดไม่ได้จ้า");
+        }
     },
     handleFileUpload() {
-      // console.log(this.$refs.file.files[0]);
+      // console.log(this.$refs.file.files[0].name);
       this.file = this.$refs.file.files[0];
     },
     Test() {
       this.$emit("AnClock", this.name_log);
     },
     createFolderDate() {
+      // var arr=this.$store.state.dataFile.filter(item => item.nameFile == this.inPutPath);
+      // console.log(arr.length);
+      if(this.$store.state.dataFile.filter(item => item.nameFile == this.inPutPath).length != 0){
+        alert("สร้างไม่ได้จ้า")
+      }else if (this.$store.state.dataFile.filter(item => item.nameFile == this.inPutPath).length == 0){
       this.$store.state.dataFile.forEach(data => {
         console.log(data.nameFile);
       });
@@ -132,12 +143,14 @@ export default {
         })
           .then(() => {
             this.getData();
+            this.ModalNewFolder = false;
           })
           .catch((error) => {
             console.error(error);
           });
       } else {
         alert("Name Folder is Null");
+      }
       }
     },
     getData() {
@@ -179,7 +192,7 @@ export default {
         NameFile: "Test",
         Path: "/uploads/asd",
       },
-      showModal: false,
+      Upload: false,
       ModalNewFolder: false,
       inPutPath: "",
       pathFile: {

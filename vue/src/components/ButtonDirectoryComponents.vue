@@ -88,7 +88,7 @@ export default {
       },
       dataFile: [
         {
-          iD: null,
+          iD: undefined,
           nameFile: "",
           path: "",
           type: "",

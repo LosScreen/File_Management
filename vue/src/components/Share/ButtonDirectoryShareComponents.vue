@@ -85,7 +85,7 @@ export default {
   },
   data() {
     return {
-      poplog:null,
+      poplog:undefined,
        GetData:{
         path: "",
         iduser: 24,
@@ -96,7 +96,7 @@ export default {
       },
       dataFile: [
         {
-          iD: null,
+          iD: undefined,
           nameFile: "",
           path: "",
           type: "",
