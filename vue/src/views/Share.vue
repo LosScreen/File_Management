@@ -19,8 +19,9 @@
             v-for="(item, inx) in nameMenu"
             :key="inx"
             :name_Menu="item.Name_Menu"
-            @AnClock="onClock"
+            
           >
+          <!-- @AnClock="onClock" -->
           </Menu>
         </ul>
       </div>
@@ -82,27 +83,11 @@ export default {
         })
         .then((response) => {
           this.$store.state.dataFile = response.data;
-          // console.log(this.$store.state.dataFile)
-          // console.log(this.$store.state.dataFile);
-          // console.log(this.dataFile);
-          // console.log(response.data);
 
-          // response.data.forEach(element => {
-          //   console.log(element);
-          //   this.dataFile.nameFile = element.nameFile;
-          // });
-
-          // this.dataFile.nameFile = response.nameFile;
-          // console.log(response);
-          // console.log(response.data[0].nameFile);
         })
         .catch((error) => {
           console.error(error);
         });
-    },
-
-    onClock(value) {
-      this.dataFile.push({ nameFile: value });
     },
   },
   created() {

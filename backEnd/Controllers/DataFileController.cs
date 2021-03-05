@@ -42,6 +42,78 @@ namespace backEnd.Controllers
 
         [Authorize]
         [HttpPost]
+        [Route("GetAllDataFiles")]
+        public IEnumerable<DataFile> GetAllDataFiles([FromBody] DataFile GetData)
+        {
+            ResponseErr res = new ResponseErr();
+            DataFile data = new DataFile();
+            var db = new ConMySQL();
+            List<DataFile> list_result = new List<DataFile>();
+            try
+            {
+                db.Open();
+                Request.Headers.TryGetValue("Authorization", out var token);
+                token = ((string)token).Replace("Bearer ", "");
+                var handler = new JwtSecurityTokenHandler();
+                JwtSecurityToken decodedValue = handler.ReadJwtToken(token);
+                List<Claim> claimsList = decodedValue.Claims.ToList();
+                var id = claimsList.Find(x => x.Type == "unique_name").Value;
+
+                // Console.WriteLine(claimsList);
+                int Share = 0;
+                // int id = 23;
+                // string sql = $"SELECT * FROM DataFile";
+                // string sql = string.Format("SELECT * FROM DataFile WHERE Path = '{0}'and IdUser = '{1}'", datafile.Path, id);
+                string sql = string.Format("SELECT * FROM DataFile WHERE Path like '{0}%'and IdUser = '{1}' and Share = '{2}'", GetData.Path, id, Share);
+                // Console.WriteLine(sql);
+                DataTable SqlDataSet = db.get(sql);
+
+                foreach (DataRow dr in SqlDataSet.Rows)
+                {
+                    DataFile obj = new DataFile();
+                    obj.Id = Convert.ToInt32(dr["id"]);
+                    obj.NameFile = dr["namefile"].ToString();
+                    obj.Path = dr["path"].ToString();
+                    obj.Type = dr["type"].ToString();
+                    obj.wwwPath = dr["wwwpath"].ToString();
+                    obj.IdUser = Convert.ToInt32(dr["iduser"]);
+                    obj.MainFolder = Convert.ToInt32(dr["MainFolder"]);
+                    list_result.Add(obj);
+                }
+
+
+
+
+                string sqlA = string.Format("SELECT * FROM DataFile WHERE Path like '{0}%'and IdUser != '{1}' and Share = '{2}'", GetData.Path, id, id);
+                // Console.WriteLine(sqlA);
+                DataTable SqlDataSetA = db.get(sqlA);
+
+                foreach (DataRow dr in SqlDataSetA.Rows)
+                {
+                    DataFile obj = new DataFile();
+                    obj.Id = Convert.ToInt32(dr["id"]);
+                    obj.NameFile = dr["namefile"].ToString();
+                    obj.Path = dr["path"].ToString();
+                    obj.Type = dr["type"].ToString();
+                    obj.wwwPath = dr["wwwpath"].ToString();
+                    obj.IdUser = Convert.ToInt32(dr["iduser"]);
+                    obj.MainFolder = Convert.ToInt32(dr["MainFolder"]);
+                    list_result.Add(obj);
+                }
+                // return Ok(claimsList);
+                db.Close();
+            }
+            catch (Exception ex)
+            {
+                res.msg = ex.Message;
+                res.listdata = list_result;
+                Console.WriteLine(ex.Message);
+                // return BadRequest();
+            }
+            return list_result;
+        }
+        [Authorize]
+        [HttpPost]
         [Route("getData")]
         // IEnumerable<DataFile>
         public IEnumerable<DataFile> GetDataFiles([FromBody] DataFile GetData)
@@ -80,6 +152,7 @@ namespace backEnd.Controllers
                     obj.Type = dr["type"].ToString();
                     obj.wwwPath = dr["wwwpath"].ToString();
                     obj.IdUser = Convert.ToInt32(dr["iduser"]);
+                    obj.MainFolder = Convert.ToInt32(dr["MainFolder"]);
                     list_result.Add(obj);
                 }
                 // return Ok(claimsList);

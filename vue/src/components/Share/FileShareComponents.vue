@@ -40,6 +40,7 @@
         />
         <div class="card-body">
           {{ item.nameFile }}
+          <a v-if="item.mainFolder != 0">Share</a>
           <!-- {{ item.type }} -->
         </div>
       </div>
@@ -48,7 +49,7 @@
         v-if="item.type == 'Folder'"
         @contextmenu.prevent="$refs.menu.open"
         @click.right="logFile(item)"
-        @click="openFolder(item.nameFile, item.type)"
+        @click="openFolder(item.nameFile, item.type, item.path)"
         class="card Card-Box"
         style="width: 18rem"
       >
@@ -61,6 +62,7 @@
         />
         <div class="card-body">
           {{ item.nameFile }}
+          <a v-if="item.mainFolder != 0">Share</a>
           <!-- {{ item.type }} -->
         </div>
       </div>
@@ -92,7 +94,7 @@
       <li v-if="dataFile.type == 'Folder'">
         <a
           href="#"
-          @click.prevent="openFolder(dataFile.nameFile, dataFile.type)"
+          @click.prevent="openFolder(dataFile.nameFile, dataFile.type,dataFile.path)"
           >Open
         </a>
       </li>
@@ -273,7 +275,24 @@ export default {
           console.log(error);
         });
     },
-
+  getAllData(){
+      this.GetAllData.path = "/uploads/"
+      console.log(this.GetData);
+      this.$axios
+        .post("DataFile/GetAllDataFiles", this.GetAllData, {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.Token,
+          },
+        })
+        .then((response) => {
+          this.$store.state.allDataFile = response.data;
+        })
+        .catch((error) => {
+          console.error(error);
+          console.log("error");
+        });
+    },
     getData() {
       this.GetData.path = "/uploads";
       // this.GetData.iduser =localStorage.IdUser;
@@ -296,26 +315,54 @@ export default {
         })
         .then((response) => {
           this.$store.state.dataFile = response.data;
+          this.$store.state.defaultDataFile =response.data;
+          this.getAllData();
           //   console.log(this.dataFile);
         })
         .catch((error) => {
           console.error(error);
         });
     },
-    openFolder(nameFile, type) {
+    openFolder(nameFile, type, path) {
       // console.log(nameFile,type);
       // this.logDirectory(nameFile);
 
-      if (type == "Folder" && this.$store.state.path == "") {
-        this.$store.state.path = this.$store.state.dataFile.find(x => x.nameFile = nameFile).path + "/" + nameFile;
-        console.log(this.$store.state.dataFile.find(x => x.nameFile = nameFile).path);
-        console.log(this.$store.state.path.replace("/uploads",""));
-      } else if (type == "Folder") {
-        this.$store.state.path += "/" + nameFile;
+      // if (type == "Folder" && this.$store.state.path == "") {
+      //   this.$store.state.path = this.$store.state.dataFile.find(x => x.nameFile = nameFile).path + "/" + nameFile;
+      //   console.log(this.$store.state.dataFile.find(x => x.nameFile = nameFile).path);
+      //   console.log(this.$store.state.path.replace("/uploads",""));
+      // } else if (type == "Folder") {
+      //   this.$store.state.path += "/" + nameFile;
+      // }
+      // this.$router.push(
+      //   "/Share/" + encodeURIComponent(this.$store.state.path.replace("/uploads",""))
+      // );
+
+
+
+      console.log(path);
+      path += "/" + nameFile;
+
+      console.log(path);
+      var str = path.split("/");
+      var mapstr = str.map((str) => "/" + str);
+
+      console.log(mapstr.length);
+      console.log(mapstr);
+      var cnt = mapstr.length;
+      this.$store.state.path = "";
+      for (var i = 2; i < cnt; i++) {
+        console.log(mapstr[i]);
+        this.$store.state.path += mapstr[i];
+
       }
+      console.log(this.$store.state.path);
+
       this.$router.push(
-        "/Share/" + encodeURIComponent(this.$store.state.path.replace("/uploads",""))
+        "/Share/" + encodeURIComponent(this.$store.state.path)
       );
+
+
       // console.log(this.$route.params.id);
       this.logDirectory(nameFile);
       this.getData();
@@ -329,6 +376,9 @@ export default {
     return {
       UserNameShare:"",
       ModalShare: false,
+      GetAllData:{
+        path: undefined,
+      },
       GetData: {
         path: "",
         iduser: 24,

@@ -55,6 +55,24 @@ export default {
       this.getData();
       console.log(this.$store.state.directory.length);
     },
+    getAllData(){
+      this.GetAllData.path = "/uploads/"
+      console.log(this.GetData);
+      this.$axios
+        .post("DataFile/GetAllDataFiles", this.GetAllData, {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.Token,
+          },
+        })
+        .then((response) => {
+          this.$store.state.allDataFile = response.data;
+        })
+        .catch((error) => {
+          console.error(error);
+          console.log("error");
+        });
+    },
     getData() {
       //   console.log(this.pathDirectory);
       // this.GetData.iduser = localStorage.IdUser;
@@ -76,6 +94,8 @@ export default {
         })
         .then((response) => {
           this.$store.state.dataFile = response.data;
+          this.$store.state.defaultDataFile =response.data;
+          this.getAllData();
           //   console.log(this.dataFile);
         })
         .catch((error) => {
@@ -86,6 +106,9 @@ export default {
   data() {
     return {
       poplog:undefined,
+      GetAllData:{
+        path: undefined,
+      },
        GetData:{
         path: "",
         iduser: 24,

@@ -19,8 +19,9 @@
             v-for="(item, inx) in nameMenu"
             :key="inx"
             :name_Menu="item.Name_Menu"
-            @AnClock="onClock"
+            
           >
+          <!-- @AnClock="onClock" -->
           </Menu>
         </ul>
       </div>
@@ -63,9 +64,27 @@ export default {
     Navbar,
   },
   methods: {
+    getAllData(){
+      this.GetAllData.path = "/uploads/"
+      // console.log(this.GetData);
+      this.$axios
+        .post("DataFile/GetAllDataFiles", this.GetAllData, {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.Token,
+          },
+        })
+        .then((response) => {
+          this.$store.state.allDataFile = response.data;
+        })
+        .catch((error) => {
+          console.error(error);
+          console.log("error");
+        });
+    },
     getData() {
       this.GetData.path = "/uploads";
-      console.log("response");
+      // console.log("response");
       // this.GetData.iduser =localStorage.IdUser;
       // console.log(this.$axios);
       if (this.$route.params.id == undefined) {
@@ -104,6 +123,9 @@ export default {
         })
         .then((response) => {
           this.$store.state.dataFile = response.data;
+          this.$store.state.defaultDataFile =response.data;
+          this.getAllData();
+          // console.log(this.$store.state.dataFile);
           // console.log(this.$store.state.dataFile)
           // console.log(this.$store.state.dataFile);
           // console.log(this.dataFile);
@@ -124,9 +146,9 @@ export default {
         });
     },
 
-    onClock(value) {
-      this.dataFile.push({ nameFile: value });
-    },
+    // onClock(value) {
+    //   this.dataFile.push({ nameFile: value });
+    // },
   },
   created() {
     window.onpopstate = function () {
@@ -134,13 +156,14 @@ export default {
     };
   },
   mounted() {
-    console.log(this.$store.state.dataFile)
+    // console.log(this.$store.state.dataFile)
     if(localStorage.Token == ""){
       this.$router.push("/login");
     }
     else if (localStorage.Token != null) {
     this.$store.state.dataFile == null;
     this.getData();
+    this.getAllData();
     this.$store.state.atDirectory = ["Home/"];
     // var f = this.getData();
     // console.log(this.dataFile.nameFile);
@@ -156,6 +179,9 @@ export default {
         path: "",
         iduser: 24,
         token: localStorage.token,
+      },
+      GetAllData:{
+        path: undefined,
       },
       pathFile: {
         path: "/uploads",

@@ -26,10 +26,10 @@
     </div>
     
 
-    <Modal v-model="ModalNewFolder" title="My first modal">
-      <label>Name Folder</label>
-      <input v-model="inPutPath" /><br />
-      <button v-on:click="createFolderDate()">Yes</button>
+    <Modal v-model="ModalNewFolder" title="New Folder">
+      <label style="display: inline-block;">Name Folder</label>
+      <input style="display: inline-block; margin:0px 10px;" v-model="inPutPath" />
+      <button style="display: inline-block;" v-on:click="createFolderDate()">Yes</button>
     </Modal>
     <Modal v-model="Upload" title="My first modal">
       <label
@@ -55,9 +55,11 @@ export default {
   methods: {
     MyDrive(){
       this.$router.push("/MyDrive/" +encodeURIComponent("/"+localStorage.Username));
+      this.$store.state.directory = ["Home"]
     },
     ShareLink(){
       this.$router.push("/Share/");
+      this.$store.state.directory = ["Home"]
     },
     submitFile() {
       // console.log(this.$store.state.dataFile.filter(item => item.nameFile == this.$refs.file.files[0].name).length);
@@ -67,7 +69,7 @@ export default {
       // formData.append("iduser", localStorage.IdUser);
       if (this.$store.state.path != "") {
         formData.append("path",decodeURIComponent(this.$route.params.id));
-        console.log(this.$store.state.path);
+        // console.log(this.$store.state.path);
       } else if (this.$store.state.path == "") {
         formData.append("path","/"+localStorage.Username);
       }
@@ -94,7 +96,7 @@ export default {
         })
         .then(() => {
           this.getData();
-          console.log("SUCCESS!!");
+          // console.log("SUCCESS!!");
           this.Upload = false;
         })
         .catch(function (error) {
@@ -117,21 +119,21 @@ export default {
       if(this.$store.state.dataFile.filter(item => item.nameFile == this.inPutPath).length != 0){
         alert("สร้างไม่ได้จ้า")
       }else if (this.$store.state.dataFile.filter(item => item.nameFile == this.inPutPath).length == 0){
-      this.$store.state.dataFile.forEach(data => {
-        console.log(data.nameFile);
-      });
-      console.log(this.$store.state.dataFile);
+      // this.$store.state.dataFile.forEach(data => {
+      //   // console.log(data.nameFile);
+      // });
+      // console.log(this.$store.state.dataFile);
       this.New_Folder.NameFile = this.inPutPath;
       // this.New_Folder.IdUser = localStorage.IdUser;
       // console.log(this.$store.state.path);
       if (this.$store.state.path == "") {
         this.New_Folder.Path = "/uploads/"+localStorage.Username;
-        console.log("!");
+        // console.log("!");
       } else if (this.$store.state.path != "") {
         this.New_Folder.Path = "/uploads"+ decodeURIComponent(this.$route.params.id);
-        console.log("2");
+        // console.log("2");
       }
-      console.log(this.$store.state.directory);
+      // console.log(this.$store.state.directory);
       if (this.$store.state.NameFile != "") {
 
         this.$axios
@@ -153,6 +155,24 @@ export default {
       }
       }
     },
+    getAllData(){
+      this.GetAllData.path = "/uploads/"
+      console.log(this.GetData);
+      this.$axios
+        .post("DataFile/GetAllDataFiles", this.GetAllData, {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.Token,
+          },
+        })
+        .then((response) => {
+          this.$store.state.allDataFile = response.data;
+        })
+        .catch((error) => {
+          console.error(error);
+          console.log("error");
+        });
+    },
     getData() {
       this.GetData.path = "/uploads/"+localStorage.Username;
       // this.GetData.iduser =localStorage.IdUser;
@@ -162,7 +182,7 @@ export default {
         this.GetData.path += this.$store.state.path;
         // console.log(this.pathFile.path);
       }
-      console.log(this.GetData);
+      // console.log(this.GetData);
       // this.pathFile.path = "/uploads/asd/dsa";
       // console.log(this.pathFile.path);
       this.$axios
@@ -174,7 +194,9 @@ export default {
         })
         .then((response) => {
           this.$store.state.dataFile = response.data;
-          //   console.log(this.dataFile);
+          this.$store.state.defaultDataFile = response.data;
+            // console.log(this.dataFile);
+          this.getAllData();
         })
         .catch((error) => {
           console.error(error);
@@ -188,6 +210,9 @@ export default {
   },
   data() {
     return {
+      GetAllData:{
+        path: undefined,
+      },
       Testdata:{
         NameFile: "Test",
         Path: "/uploads/asd",

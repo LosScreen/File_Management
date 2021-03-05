@@ -6,11 +6,15 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     path:"",
-    dataFile:[
+    allDataFile:[
       {
 
       }
     ],
+    dataFile:[
+      
+    ],
+    defaultDataFile:[],
     directory: ["Home"],
     atDirectory:"",
     deDirectory:"",
