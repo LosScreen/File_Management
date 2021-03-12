@@ -168,8 +168,8 @@ export default {
               "Bearer " + localStorage.Token,
           },
         })
-          .then(() => {
-            // console.log(res.data);
+          .then((res) => {
+            console.log(res.data);
             // console.log(res);
             this.ModalShare = false;
           })

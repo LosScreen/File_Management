@@ -32,7 +32,7 @@
           :Type="item.type" -->
         <div class="row" style="">
           <div class="col" style="border-bottom: rgb(206, 206, 206) 1px solid">
-            <Directory />
+            <DirectoryShare />
           </div>
           <div class="col" style="border-bottom: rgb(206, 206, 206) 1px solid">
             <beforeDirectory />
@@ -51,7 +51,7 @@
 <script>
 import Menu from "@/components/Menu.vue";
 import FileShareComponents from "@/components/Share/FileShareComponents.vue";
-import Directory from "@/components/DirectoryComponents.vue";
+import DirectoryShare from "@/components/Share/DirectoryShareComponents.vue";
 import beforeDirectory from "@/components/Share/ButtonDirectoryShareComponents.vue";
 import Navbar from "@/components/NavbarComponents.vue";
 
@@ -59,7 +59,7 @@ export default {
   components: {
     Menu,
     FileShareComponents,
-    Directory,
+    DirectoryShare,
     beforeDirectory,
     Navbar,
   },
@@ -70,9 +70,23 @@ export default {
       // console.log(this.$axios);
       if (this.$route.params.id == undefined) {
         this.GetData.path = null;
-      } else {
+        console.log("undefined");
+        this.$axios
+        .post("DataFileShare/getdata", this.GetData, {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.Token,
+          },
+        })
+        .then((response) => {
+          this.$store.state.dataFile = response.data;
+
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+      } else if (this.$route.params.id != undefined && this.$route.params.namefile == undefined) {
         this.GetData.path += decodeURIComponent(this.$route.params.id);
-      }
       // console.log(this.getData);
       this.$axios
         .post("DataFileShare/getdata", this.GetData, {
@@ -88,6 +102,28 @@ export default {
         .catch((error) => {
           console.error(error);
         });
+        } else if (this.$route.params.namefile != undefined) {
+          // console.log(this.$route.params.namefile);
+          this.GetData.path += decodeURIComponent(this.$route.params.id);
+      // console.log(this.getData);
+      const str = "?nameFile=" + this.$route.params.namefile;
+      console.log(str);
+      this.$axios
+        .post("DataFileShare/getdata"+ str, this.GetData, {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.Token,
+          },
+        })
+        .then((response) => {
+          this.$store.state.dataFile = response.data;
+          console.log(response.data);
+
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+        }
     },
   },
   created() {

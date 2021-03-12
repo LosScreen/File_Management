@@ -49,7 +49,7 @@ namespace backEnd.Controllers
             {
                 var db = new ConMySQL();
                 var pathsql = "/uploads/" + data.userName;
-                string sqluser = $"INSERT INTO User(UserName, Password) VALUES ('{data.userName}','{data.passWord}')";
+                string sqluser = $"INSERT INTO User(UserName, Password, Email) VALUES ('{data.userName}','{data.passWord}','{data.email}')";
                 db.executeQuery(sqluser);
 
                 string sqlgetuser = $"SELECT * FROM User WHERE UserName = '{data.userName}'";

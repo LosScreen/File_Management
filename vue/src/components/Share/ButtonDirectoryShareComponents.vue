@@ -26,7 +26,7 @@ export default {
 
 
       this.$store.state.path = "";
-      this.pathDirectory = "/uploads"+decodeURIComponent(this.$route.params.id);
+      this.pathDirectory = "/Share"+decodeURIComponent(this.$route.params.id);
       // console.log(cnt)
       // console.log(this.$store.state.directory);
       // for (var i = 0; i < this.$store.state.directory.length; i++) {

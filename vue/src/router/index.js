@@ -49,6 +49,11 @@ const routes = [
     path: "/PreviewShare/:path?",
     name: "PreviewShare",
     component: PhotoShare
+  },
+  {
+    path: "/Share/:id?/:namefile?",
+    name: "Share",
+    component: Share
   }
 ];
 

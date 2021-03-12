@@ -11,6 +11,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+using backEnd.Models;
+// using Send_Mail_To_gMail.Models;
+// using System.Net.Mail;
+
+using MailKit.Net.Smtp;
+using MailKit.Security;
+
+using MailKit.Net.Pop3;
+using MailKit;
+using MimeKit;
+using MimeKit.Text;
+
 namespace backEnd.Controllers
 {
     [Route("api/[controller]")]
@@ -23,6 +35,56 @@ namespace backEnd.Controllers
         {
             _config = config;
         }
+        
+        
+        [HttpPost]
+        [Route("Email")]
+        public IActionResult Email(){
+            try
+            {
+                // password 123456789top
+                // string to = em.To;
+                // string subject = em.Subject;
+                // string body = em.Body;
+                // MailMessage mm = new MailMessage();
+                // mm.To.Add(to);
+                // mm.Subject = subject;
+                // mm.Body = body;
+                // mm.From = new MailMessage("testemail.2541@hotmail.com");
+                // mm.IsBodyHtml = false;
+                // SmtpClient smtp = new SmtpClient("smtp.gmail.com");
+                // smtp.Port = 587;
+                // smtp.UseDefualtCreadentials = true;
+                // smtp.EnableSsl = true;
+                // smtp.Credentials = new System.Net.NetworkCredential("testemail.2541@hotmail.com", "123456789top");
+                // smtp.Send(mm);
+
+
+                var email = new MimeMessage();
+                email.From.Add(MailboxAddress.Parse("testemail.2541@gmail.com"));
+                email.To.Add(MailboxAddress.Parse("gogorotop5@gmail.com"));
+                email.Subject = "Test Email Subject";
+                email.Body = new TextPart(TextFormat.Html) { Text = "<h3>Example HTML Message Body</h3>" };
+
+
+                // send email
+                using var smtp = new SmtpClient();
+                smtp.Connect("smtp.gmail.com", 465);
+                smtp.Authenticate("testemail.2541@gmail.com", "123456789top");
+                smtp.Send(email);
+                smtp.Disconnect(true);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
         [AllowAnonymous]
         [HttpPost]
         [Route("Login")]

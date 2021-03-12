@@ -26,6 +26,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 
+using MailKit.Net.Smtp;
+using MimeKit;
+using MimeKit.Text;
+using System.Web;
+
 namespace backEnd.Controllers
 {
     [ApiController]
@@ -36,7 +41,7 @@ namespace backEnd.Controllers
         [HttpPost]
         [Route("getData")]
         // IEnumerable<DataFile>
-        public IEnumerable<DataFile> GetDataFiles([FromBody] DataFile GetData)
+        public IEnumerable<DataFile> GetDataFiles([FromBody] DataFile GetData, [FromQuery]string nameFile=null)
         {
             ResponseErr res = new ResponseErr();
             DataFile data = new DataFile();
@@ -57,7 +62,7 @@ namespace backEnd.Controllers
                 // int id = 23;
                 // string sql = $"SELECT * FROM DataFile";
                 // string sql = string.Format("SELECT * FROM DataFile WHERE Path = '{0}'and IdUser = '{1}'", datafile.Path, id);
-                if(GetData.Path != null){
+                if(GetData.Path != null && nameFile == null){
                 string sql = string.Format("SELECT * FROM DataFile WHERE Path = '{0}' and Share = '{1}'", GetData.Path, id);
                 Console.WriteLine(sql);
                 DataTable SqlDataSetA = db.getData(sql);
@@ -72,7 +77,7 @@ namespace backEnd.Controllers
                     obj.IdUser = Convert.ToInt32(dr["iduser"]);
                     list_result.Add(obj);
                 }
-                }else if (GetData.Path ==null){
+                }else if (GetData.Path ==null && nameFile == null){
                 string sql = string.Format("SELECT * FROM DataFile WHERE Share = '{0}'", id);
                 Console.WriteLine(sql);
                 DataTable SqlDataSet = db.getData(sql);
@@ -87,20 +92,22 @@ namespace backEnd.Controllers
                     obj.IdUser = Convert.ToInt32(dr["iduser"]);
                     list_result.Add(obj);
                 }
+                }else if (nameFile !=null){
+                string sql = string.Format("SELECT * FROM DataFile WHERE Path = '{0}' and Share = '{1}' and NameFile = '{2}'", GetData.Path, id, nameFile);
+                Console.WriteLine(sql);
+                DataTable SqlDataSetA = db.getData(sql);
+                foreach (DataRow dr in SqlDataSetA.Rows)
+                {
+                    DataFile obj = new DataFile();
+                    obj.Id = Convert.ToInt32(dr["id"]);
+                    obj.NameFile = dr["namefile"].ToString();
+                    obj.Path = dr["path"].ToString();
+                    obj.Type = dr["type"].ToString();
+                    obj.wwwPath = dr["wwwpath"].ToString();
+                    obj.IdUser = Convert.ToInt32(dr["iduser"]);
+                    list_result.Add(obj);
                 }
-
-                // foreach (DataRow dr in SqlDataSet.Rows)
-                // {
-                //     DataFile obj = new DataFile();
-                //     obj.Id = Convert.ToInt32(dr["id"]);
-                //     obj.NameFile = dr["namefile"].ToString();
-                //     obj.Path = dr["path"].ToString();
-                //     obj.Type = dr["type"].ToString();
-                //     obj.wwwPath = dr["wwwpath"].ToString();
-                //     obj.IdUser = Convert.ToInt32(dr["iduser"]);
-                //     list_result.Add(obj);
-                // }
-                // return Ok(claimsList);
+                }
             }
             catch (Exception ex)
             {
@@ -537,11 +544,39 @@ namespace backEnd.Controllers
 
         [Authorize]
         [HttpPost]
+        [Route("SendShareEmail")]
+        public IActionResult SendShareEmail(Email mm, string linkShare=null){
+            try{
+                var email = new MimeMessage();
+                email.From.Add(MailboxAddress.Parse(mm.From));
+                email.To.Add(MailboxAddress.Parse(mm.To));
+                //"Test Email Subject"
+                email.Subject = mm.Subject;
+                email.Body = new TextPart(TextFormat.Html) { Text = "<h3>Example HTML Message Body</h3>" };
+
+
+                // send email
+                using var smtp = new SmtpClient();
+                smtp.Connect("smtp.gmail.com", 465);
+                smtp.Authenticate("testemail.2541@gmail.com", "123456789top");
+                smtp.Send(email);
+                smtp.Disconnect(true);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
         [Route("Share")]
         public IActionResult Share([FromBody] DataFile data,[FromQuery]string username){
             var db = new ConMySQL();
             db.Open();
-
             Request.Headers.TryGetValue("Authorization", out var token);
                 token = ((string)token).Replace("Bearer ", "");
                 var handler = new JwtSecurityTokenHandler();
@@ -551,6 +586,15 @@ namespace backEnd.Controllers
             try
             {
                 if(data.Type != "Folder"){
+
+                string sqlMainUser = string.Format("SELECT * FROM User WHERE Id = '{0}'", id);
+                DataTable SqlMainData = db.get(sqlMainUser);
+                User objMainUser = new User();
+                foreach (DataRow dr in SqlMainData.Rows)
+                    {
+                        // objMainUser.id = Convert.ToInt32(dr["id"]);
+                        objMainUser.email = dr["email"].ToString();
+                    }
                 
                 string sqlUser = string.Format("SELECT * FROM User WHERE UserName = '{0}'", username);
                 DataTable SqlData = db.get(sqlUser);
@@ -558,6 +602,7 @@ namespace backEnd.Controllers
                 foreach (DataRow dr in SqlData.Rows)
                     {
                         objUser.id = Convert.ToInt32(dr["id"]);
+                        objUser.email = dr["email"].ToString();
                     }
 
                 // Console.WriteLine(data.NameFile);
@@ -579,9 +624,18 @@ namespace backEnd.Controllers
                         obj.IdUser = Convert.ToInt32(dr["iduser"]);
                     }
                 // Console.WriteLine("2");
+                // obj.Path.Replace("/uploads", "");
+                Console.WriteLine("http://localhost:8080/Share/"+ HttpUtility.UrlEncode(obj.Path.Replace("/uploads", "")) + "/"+ obj.NameFile);
+
+                // Email mm = new Email();
+                // mm.From = objMainUser.email;
+                // mm.To = objUser.email;
+                
+                // SendShareEmail(mm);
+
                 db.Close();
                     if(obj.NameFile != null){
-                        string sqlShare = $"INSERT INTO DataFile(NameFile, Path, Type, wwwPath, IdUser, Share) VALUES ('{obj.NameFile}','{obj.Path}', '{obj.Type}', '{obj.wwwPath}', '{obj.IdUser}', '{objUser.id}')";
+                        string sqlShare = $"INSERT INTO DataFile(NameFile, Path, Type, wwwPath, IdUser, Share, MainFolder) VALUES ('{obj.NameFile}','{obj.Path}', '{obj.Type}', '{obj.wwwPath}', '{obj.IdUser}', '{objUser.id}',{obj.Id})";
                         db.executeQuery(sqlShare);
                     }
 
@@ -590,12 +644,14 @@ namespace backEnd.Controllers
                 // Console.WriteLine(.Length);
                 else if(data.Type == "Folder")
                 {
+                    Console.WriteLine("Tech");
                 string sqlUser = string.Format("SELECT * FROM User WHERE UserName = '{0}'", username);
                 DataTable SqlData = db.get(sqlUser);
                 User objUser = new User();
                 foreach (DataRow dr in SqlData.Rows)
                     {
                         objUser.id = Convert.ToInt32(dr["id"]);
+                        objUser.email = dr["email"].ToString();
                     }
                 List<DataFile> list_result = new List<DataFile>();
 

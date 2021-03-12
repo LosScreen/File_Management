@@ -5,5 +5,6 @@ namespace backEnd.Models
         public int id { get; set; }
         public string userName { get; set; }
         public string passWord { get; set; }
+        public string email { get; set; }
     }
 }

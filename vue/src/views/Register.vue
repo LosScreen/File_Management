@@ -39,7 +39,7 @@
                   />
                 </div>
               </div>
-              <div class="form-group row mb-3" style="">
+              <div class="form-group row mb-2" style="">
                 <div
                   class="col"
                   style="
@@ -58,6 +58,29 @@
                     class="text_box"
                     v-model="UserData.passWord"
                     placeholder="Password"
+                    
+                  />
+                </div>
+              </div>
+               <div class="form-group row mb-3" style="">
+                <div
+                  class="col"
+                  style="
+                    background-color: #d4d4d4;
+                    border-radius: 25px;
+                    height: 40px;
+                  "
+                >
+                  <i
+                    class="fas fa-lock"
+                    style="color: gray; margin-right: 10px"
+                  ></i>
+                  <input
+                    type="email"
+                    style="margin: 0 0 10px 0"
+                    class="text_box"
+                    v-model="UserData.email"
+                    placeholder="Email"
                     
                   />
                 </div>
@@ -83,10 +106,12 @@ export default {
       this.$router.push("/Login");
     },
     Register() {
-      if (this.UserData.userName == null) {
+      if (this.UserData.userName == undefined) {
         alert("Username is null");
-      } else if (this.UserData.passWord == null) {
+      } else if (this.UserData.passWord == undefined) {
         alert("Password is null");
+      } else if (this.UserData.email == undefined) {
+        alert("Email is null");
       } else {
         this.$axios
           .post("User/checkRegister", this.UserData)
@@ -117,6 +142,7 @@ export default {
       UserData: {
         userName: undefined,
         passWord: undefined,
+        email: undefined
       },
     };
   },

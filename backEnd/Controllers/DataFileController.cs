@@ -25,6 +25,12 @@ using System.IO.Compression;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using System.Web;
+
+using MailKit.Net.Smtp;
+using MimeKit;
+using MimeKit.Text;
+using System.Web;
 
 namespace backEnd.Controllers
 {
@@ -629,6 +635,16 @@ namespace backEnd.Controllers
                 var id = claimsList.Find(x => x.Type == "unique_name").Value;
             try
             {
+                
+                string sqlMainUser = string.Format("SELECT * FROM User WHERE Id = '{0}'", id);
+                DataTable SqlMainData = db.get(sqlMainUser);
+                User objMainUser = new User();
+                foreach (DataRow dr in SqlMainData.Rows)
+                    {
+                        // objMainUser.id = Convert.ToInt32(dr["id"]);
+                        objMainUser.email = dr["email"].ToString();
+                    }
+                
                 // Console.WriteLine(data.Type);
                 if(data.Type != "Folder"){
                 
@@ -638,6 +654,7 @@ namespace backEnd.Controllers
                 foreach (DataRow dr in SqlData.Rows)
                     {
                         objUser.id = Convert.ToInt32(dr["id"]);
+                        objUser.email = dr["email"].ToString();
                     }
 
                 Console.WriteLine(objUser.id);
@@ -659,15 +676,50 @@ namespace backEnd.Controllers
                         obj.wwwPath = dr["wwwpath"].ToString();
                         obj.IdUser = Convert.ToInt32(dr["iduser"]);
                     }
-                // Console.WriteLine("2");
-                db.Close();
+
+                
+
+
+                Console.WriteLine(obj.Id);
+                string sqlz = string.Format("SELECT * FROM DataFile WHERE Share = '{0}' and MainFolder = '{1}'", objUser.id, obj.Id);
+                DataTable SqlDataz = db.get(sqlz);
+                DataFile objz = new DataFile();
+                // List<DataFile> list_result = new List<DataFile>();
+                foreach (DataRow dr in SqlDataz.Rows)
+                    {
+                        objz.Id = Convert.ToInt32(dr["id"]);
+                        objz.NameFile = dr["namefile"].ToString();
+                        objz.Path = dr["path"].ToString();
+                        objz.Type = dr["type"].ToString();
+                        objz.File = dr["file"].ToString();
+                        objz.wwwPath = dr["wwwpath"].ToString();
+                        objz.IdUser = Convert.ToInt32(dr["iduser"]);
+                    }
+                if(objz.Id == 0){
                     if(obj.NameFile != null){
                         string sqlShare = $"INSERT INTO DataFile(NameFile, Path, Type, wwwPath, IdUser, Share, MainFolder) VALUES ('{obj.NameFile}','{obj.Path}', '{obj.Type}', '{obj.wwwPath}', '{obj.IdUser}', '{objUser.id}',{obj.Id})";
-                        db.executeQuery(sqlShare);
+                        db.execute(sqlShare);
                         Console.WriteLine(sqlShare);
-                    }
 
-                return Ok("Eiei");
+                        // string to = objUser.email;
+                        // Console.WriteLine("http://localhost:8080/Share/"+ HttpUtility.UrlEncode(obj.Path.Replace("/uploads", "")) + "/"+ obj.NameFile);
+                        string linkshare = "http://localhost:8080/Share/"+ HttpUtility.UrlEncode(obj.Path.Replace("/uploads", "")) + "/"+ obj.NameFile;
+                        Email mm = new Email();
+                        mm.From = objMainUser.email;
+                        mm.To = objUser.email;
+                        mm.Subject = "มีการแชร์ไฟล์มาถึงคุณ";
+                        
+                        SendShareEmail(mm,linkshare);
+
+
+                    }
+                db.Close();
+                return Ok("โอเค แบบ File");
+                }else{
+                    return Ok("แชร์ไปแล้ว");
+                }
+
+
                 }
                 // Console.WriteLine(.Length);
 
@@ -685,6 +737,7 @@ namespace backEnd.Controllers
                 foreach (DataRow dr in SqlData.Rows)
                     {
                         objUser.id = Convert.ToInt32(dr["id"]);
+                        objUser.email = dr["email"].ToString();
                     }
 
                 Console.WriteLine(objUser.id);
@@ -726,7 +779,7 @@ namespace backEnd.Controllers
                     }
                     
                 if(list_result.Count == 0){
-                        Console.WriteLine("0");
+                        // Console.WriteLine("0");
                         Console.WriteLine(list_result.Count);
 
 
@@ -734,6 +787,7 @@ namespace backEnd.Controllers
                 string sqlFolder = string.Format("SELECT * FROM DataFile WHERE NameFile = '{0}'and Path = '{1}' and IdUser = {2} and Share = '0'", data.NameFile, data.Path, id);
                 DataTable SqlDataFolder = db.get(sqlFolder);
                 // Console.WriteLine(SqlDataFolder.Length);
+                string linkshare = null;
                 foreach (DataRow dr in SqlDataFolder.Rows)
                     {
                         DataFile obj = new DataFile();
@@ -745,8 +799,11 @@ namespace backEnd.Controllers
                         obj.wwwPath = dr["wwwpath"].ToString();
                         obj.IdUser = Convert.ToInt32(dr["iduser"]);
                         obj.MainFolder = Convert.ToInt32(dr["mainfolder"]);
+                        linkshare = "http://localhost:8080/Share/"+ HttpUtility.UrlEncode(obj.Path.Replace("/uploads", "")) + "/"+ obj.NameFile;
                         list_resultA.Add(obj);
                     }
+
+                        
 
                 string sqlC = string.Format("SELECT * FROM DataFile WHERE Path like '{0}%' and IdUser = {1} and Share = '0'", data.Path+"/"+data.NameFile, id);
                 DataTable SqlDataSetC = db.get(sqlC);
@@ -770,6 +827,7 @@ namespace backEnd.Controllers
                         // Console.WriteLine(item.NameFile);
                         string sqlShare = $"INSERT INTO DataFile(NameFile, Path, Type, wwwPath, IdUser, Share, MainFolder) VALUES ('{item.NameFile}','{item.Path}', '{item.Type}', '{item.wwwPath}', '{item.IdUser}', '{objUser.id}',{item.Id})";
                         db.execute(sqlShare);
+
                     }
                     }
                 db.Close();
@@ -784,7 +842,14 @@ namespace backEnd.Controllers
                 //     obj.wwwPath = dr["wwwpath"].ToString();
                 //     list_result.Add(obj);
                 // }
-                return Ok(list_resultA);
+                Email mm = new Email();
+                mm.From = objMainUser.email;
+                mm.To = objUser.email;
+                mm.Subject = "มีการแชร์ไฟล์มาถึงคุณ";
+                        
+                SendShareEmail(mm,linkshare);
+
+                return Ok("โอเค แบบ Folder 1");
                 }
                 else if (list_result.Count > 0){
 
@@ -794,6 +859,7 @@ namespace backEnd.Controllers
                 DataTable SqlDataFolder = db.get(sqlFolder);
                 // return Ok(SqlDataFolder);
                 // Console.WriteLine(SqlDataFolder.Length);
+                string linkshare = null;
                 foreach (DataRow dr in SqlDataFolder.Rows)
                     {
                         DataFile obj = new DataFile();
@@ -805,6 +871,8 @@ namespace backEnd.Controllers
                         obj.wwwPath = dr["wwwpath"].ToString();
                         obj.IdUser = Convert.ToInt32(dr["iduser"]);
                         obj.MainFolder = Convert.ToInt32(dr["mainfolder"]);
+                        linkshare = "http://localhost:8080/Share/"+ HttpUtility.UrlEncode(obj.Path.Replace("/uploads", "")) + "/"+ obj.NameFile;
+
                         list_resultB.Add(obj);
                         // Console.WriteLine("========");
                     }
@@ -847,19 +915,73 @@ namespace backEnd.Controllers
                         string sqlShare = $"INSERT INTO DataFile(NameFile, Path, Type, wwwPath, IdUser, Share, MainFolder) VALUES ('{itemA.NameFile}','{itemA.Path}', '{itemA.Type}', '{itemA.wwwPath}', '{itemA.IdUser}', '{objUser.id}',{itemA.Id})";
                         db.execute(sqlShare);
                         }
+
                     }
-        
+
+                    Email mm = new Email();
+                    mm.From = objMainUser.email;
+                    mm.To = objUser.email;
+                    mm.Subject = "มีการแชร์ไฟล์มาถึงคุณ";
+                        
+                    SendShareEmail(mm,linkshare);
+
+                    // Console.WriteLine("asd");
+                    db.Close();
+
+                    return Ok("โอเค แบบ Folder 2");
                 }
                 }else{
                     return Ok("ไม่มี User นี้");
                 }
                 // Console.WriteLine("Endline");
-                db.Close();
                 
                 }return Ok();
             }
             catch (Exception ex)
             {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        private IActionResult SendShareEmail(Email mm, string linkShare=null){
+            try{
+                // Console.WriteLine("linkShare");
+                // var email = new MimeMessage();
+                // email.From.Add(MailboxAddress.Parse(mm.From));
+                // email.To.Add(MailboxAddress.Parse(mm.To));
+                // //"Test Email Subject"
+                // email.Subject = mm.Subject;
+                // email.Body = new TextPart(TextFormat.Html) { Text = "<h3>ลิ้งค์ที่ไฟล์ที่ถูกแชร์มาถึงคุณ :</h3>"+linkShare};
+                // Console.WriteLine(linkShare);
+
+                // // send email
+                // using var smtp = new SmtpClient();
+                // smtp.Connect("smtp.gmail.com", 465);
+                // smtp.Authenticate("testemail.2541@gmail.com", "123456789top");
+                // smtp.Send(email);
+                // smtp.Disconnect(true);
+
+
+                var email = new MimeMessage();
+                email.From.Add(MailboxAddress.Parse(mm.From));
+                email.To.Add(MailboxAddress.Parse(mm.To));
+                email.Subject = mm.Subject;
+                email.Body = new TextPart(TextFormat.Html) { Text = "<h3>ลิ้งค์ที่ไฟล์ที่ถูกแชร์มาถึงคุณ :</h3>"+linkShare};
+
+
+                // send email
+                using var smtp = new SmtpClient();
+                smtp.Connect("smtp.gmail.com", 465);
+                smtp.Authenticate("testemail.2541@gmail.com", "123456789top");
+                smtp.Send(email);
+                smtp.Disconnect(true);
+
+                Console.WriteLine("OK");
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                
                 return BadRequest(ex.Message);
             }
         }
