@@ -40,6 +40,7 @@ namespace backEnd.Controllers
             _config = config;
         }
 
+
         [HttpPost]
         [Route("Register")]
         public IActionResult Register([FromBody] User data)

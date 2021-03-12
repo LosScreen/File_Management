@@ -168,6 +168,7 @@ export default {
         })
           .then((res) => {
             console.log(res.data);
+            this.ModalShare = false;
           })
           .catch((error) => {
             console.log(error);

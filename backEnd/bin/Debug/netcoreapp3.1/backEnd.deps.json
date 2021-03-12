@@ -10,7 +10,7 @@
       "NETCOREAPP",
       "NETCOREAPP3_1"
     ],
-    "languageVersion": "",
+    "languageVersion": "preview",
     "platform": "",
     "allowUnsafe": false,
     "warningsAsErrors": false,
@@ -24,12 +24,14 @@
     ".NETCoreApp,Version=v3.1": {
       "backEnd/1.0.0": {
         "dependencies": {
+          "ClosedXML": "0.95.4",
           "JWT": "8.0.0",
           "MailKit": "2.10.1",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "3.1.12",
           "Microsoft.AspNetCore.Mvc.NewtonsoftJson": "3.1.10",
           "Microsoft.EntityFrameworkCore": "3.1.10",
           "Microsoft.EntityFrameworkCore.Tools.DotNet": "2.0.3",
+          "Microsoft.Office.Interop.Excel": "14.0.0",
           "MySqlConnector": "1.2.1",
           "System.IO": "4.3.0",
           "System.IO.Compression": "4.3.0",
@@ -191,9 +193,9 @@
           "System.IO.Compression.FileSystem": "4.0.0.0",
           "System.IO.Compression.ZipFile": "4.0.5.0",
           "System.IO.Reference": "4.2.2.0",
-          "System.IO.FileSystem": "4.1.2.0",
+          "System.IO.FileSystem.Reference": "4.1.2.0",
           "System.IO.FileSystem.DriveInfo": "4.1.2.0",
-          "System.IO.FileSystem.Primitives": "4.1.2.0",
+          "System.IO.FileSystem.Primitives.Reference": "4.1.2.0",
           "System.IO.FileSystem.Watcher": "4.1.2.0",
           "System.IO.IsolatedStorage": "4.1.2.0",
           "System.IO.MemoryMappedFiles": "4.1.2.0",
@@ -271,16 +273,16 @@
           "System.ServiceProcess": "4.0.0.0",
           "System.Text.Encoding.CodePages.Reference": "4.1.3.0",
           "System.Text.Encoding.Reference": "4.1.2.0",
-          "System.Text.Encoding.Extensions": "4.1.2.0",
+          "System.Text.Encoding.Extensions.Reference": "4.1.2.0",
           "System.Text.Encodings.Web": "4.0.5.0",
           "System.Text.Json": "4.0.1.0",
-          "System.Text.RegularExpressions": "4.2.2.0",
+          "System.Text.RegularExpressions.Reference": "4.2.2.0",
           "System.Threading.Channels": "4.0.2.0",
           "System.Threading.Reference": "4.1.2.0",
           "System.Threading.Overlapped": "4.1.2.0",
           "System.Threading.Tasks.Dataflow": "4.6.5.0",
           "System.Threading.Tasks.Reference": "4.1.2.0",
-          "System.Threading.Tasks.Extensions": "4.3.1.0",
+          "System.Threading.Tasks.Extensions.Reference": "4.3.1.0",
           "System.Threading.Tasks.Parallel": "4.0.4.0",
           "System.Threading.Thread": "4.1.2.0",
           "System.Threading.ThreadPool": "4.1.2.0",
@@ -294,7 +296,7 @@
           "System.Windows.Extensions": "4.0.1.0",
           "System.Xml": "4.0.0.0",
           "System.Xml.Linq": "4.0.0.0",
-          "System.Xml.ReaderWriter": "4.2.2.0",
+          "System.Xml.ReaderWriter.Reference": "4.2.2.0",
           "System.Xml.Serialization": "4.0.0.0",
           "System.Xml.XDocument": "4.1.2.0",
           "System.Xml.XmlDocument": "4.1.2.0",
@@ -308,6 +310,49 @@
         },
         "compile": {
           "backEnd.dll": {}
+        }
+      },
+      "ClosedXML/0.95.4": {
+        "dependencies": {
+          "DocumentFormat.OpenXml": "2.7.2",
+          "ExcelNumberFormat": "1.0.10",
+          "Microsoft.CSharp": "4.7.0",
+          "System.Drawing.Common": "4.5.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/ClosedXML.dll": {
+            "assemblyVersion": "0.95.4.0",
+            "fileVersion": "0.95.4.0"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/ClosedXML.dll": {}
+        }
+      },
+      "DocumentFormat.OpenXml/2.7.2": {
+        "dependencies": {
+          "NETStandard.Library": "2.0.1",
+          "System.IO.Packaging": "4.0.0"
+        },
+        "runtime": {
+          "lib/netstandard1.3/DocumentFormat.OpenXml.dll": {
+            "assemblyVersion": "2.7.2.0",
+            "fileVersion": "2.7.2.0"
+          }
+        },
+        "compile": {
+          "lib/netstandard1.3/DocumentFormat.OpenXml.dll": {}
+        }
+      },
+      "ExcelNumberFormat/1.0.10": {
+        "runtime": {
+          "lib/netstandard2.0/ExcelNumberFormat.dll": {
+            "assemblyVersion": "1.0.10.0",
+            "fileVersion": "1.0.10.0"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/ExcelNumberFormat.dll": {}
         }
       },
       "JWT/8.0.0": {
@@ -707,6 +752,22 @@
       },
       "Microsoft.NETCore.Platforms/2.0.2": {},
       "Microsoft.NETCore.Targets/1.1.0": {},
+      "Microsoft.Office.Interop.Excel/14.0.0": {
+        "runtime": {
+          "lib/net40/Microsoft.Office.Interop.Excel.dll": {
+            "assemblyVersion": "14.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        },
+        "compile": {
+          "lib/net40/Microsoft.Office.Interop.Excel.dll": {}
+        }
+      },
+      "Microsoft.Win32.SystemEvents/4.5.0": {
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "2.0.2"
+        }
+      },
       "MimeKit/2.10.1": {
         "dependencies": {
           "Portable.BouncyCastle": "1.8.8",
@@ -894,6 +955,15 @@
           "System.Runtime": "4.3.0"
         }
       },
+      "System.Drawing.Common/4.5.0": {
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "2.0.2",
+          "Microsoft.Win32.SystemEvents": "4.5.0"
+        },
+        "compile": {
+          "ref/netstandard2.0/System.Drawing.Common.dll": {}
+        }
+      },
       "System.Globalization/4.3.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "2.0.2",
@@ -943,6 +1013,48 @@
           "System.Threading.Tasks": "4.3.0",
           "runtime.native.System": "4.3.0",
           "runtime.native.System.IO.Compression": "4.3.0"
+        }
+      },
+      "System.IO.FileSystem/4.0.1": {
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "2.0.2",
+          "Microsoft.NETCore.Targets": "1.1.0",
+          "System.IO": "4.3.0",
+          "System.IO.FileSystem.Primitives": "4.0.1",
+          "System.Runtime": "4.3.0",
+          "System.Runtime.Handles": "4.3.0",
+          "System.Text.Encoding": "4.3.0",
+          "System.Threading.Tasks": "4.3.0"
+        }
+      },
+      "System.IO.FileSystem.Primitives/4.0.1": {
+        "dependencies": {
+          "System.Runtime": "4.3.0"
+        }
+      },
+      "System.IO.Packaging/4.0.0": {
+        "dependencies": {
+          "System.Collections": "4.3.0",
+          "System.Diagnostics.Debug": "4.3.0",
+          "System.Globalization": "4.3.0",
+          "System.IO": "4.3.0",
+          "System.IO.Compression": "4.3.0",
+          "System.IO.FileSystem": "4.0.1",
+          "System.IO.FileSystem.Primitives": "4.0.1",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Runtime.Extensions": "4.3.0",
+          "System.Text.Encoding": "4.3.0",
+          "System.Xml.ReaderWriter": "4.0.11"
+        },
+        "runtime": {
+          "lib/netstandard1.3/System.IO.Packaging.dll": {
+            "assemblyVersion": "4.0.0.0",
+            "fileVersion": "1.0.24212.1"
+          }
+        },
+        "compile": {
+          "ref/netstandard1.3/System.IO.Packaging.dll": {}
         }
       },
       "System.Linq/4.3.0": {
@@ -1101,6 +1213,24 @@
           "Microsoft.NETCore.Platforms": "2.0.2"
         }
       },
+      "System.Text.Encoding.Extensions/4.0.11": {
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "2.0.2",
+          "Microsoft.NETCore.Targets": "1.1.0",
+          "System.Runtime": "4.3.0",
+          "System.Text.Encoding": "4.3.0"
+        }
+      },
+      "System.Text.RegularExpressions/4.1.0": {
+        "dependencies": {
+          "System.Collections": "4.3.0",
+          "System.Globalization": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Runtime.Extensions": "4.3.0",
+          "System.Threading": "4.3.0"
+        }
+      },
       "System.Threading/4.3.0": {
         "dependencies": {
           "System.Runtime": "4.3.0",
@@ -1112,6 +1242,32 @@
           "Microsoft.NETCore.Platforms": "2.0.2",
           "Microsoft.NETCore.Targets": "1.1.0",
           "System.Runtime": "4.3.0"
+        }
+      },
+      "System.Threading.Tasks.Extensions/4.0.0": {
+        "dependencies": {
+          "System.Collections": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Threading.Tasks": "4.3.0"
+        }
+      },
+      "System.Xml.ReaderWriter/4.0.11": {
+        "dependencies": {
+          "System.Collections": "4.3.0",
+          "System.Diagnostics.Debug": "4.3.0",
+          "System.Globalization": "4.3.0",
+          "System.IO": "4.3.0",
+          "System.IO.FileSystem": "4.0.1",
+          "System.IO.FileSystem.Primitives": "4.0.1",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Runtime.Extensions": "4.3.0",
+          "System.Runtime.InteropServices": "4.3.0",
+          "System.Text.Encoding": "4.3.0",
+          "System.Text.Encoding.Extensions": "4.0.11",
+          "System.Text.RegularExpressions": "4.1.0",
+          "System.Threading.Tasks": "4.3.0",
+          "System.Threading.Tasks.Extensions": "4.0.0"
         }
       },
       "Microsoft.AspNetCore.Antiforgery/3.1.0.0": {
@@ -2062,7 +2218,7 @@
         },
         "compileOnly": true
       },
-      "System.IO.FileSystem/4.1.2.0": {
+      "System.IO.FileSystem.Reference/4.1.2.0": {
         "compile": {
           "System.IO.FileSystem.dll": {}
         },
@@ -2074,7 +2230,7 @@
         },
         "compileOnly": true
       },
-      "System.IO.FileSystem.Primitives/4.1.2.0": {
+      "System.IO.FileSystem.Primitives.Reference/4.1.2.0": {
         "compile": {
           "System.IO.FileSystem.Primitives.dll": {}
         },
@@ -2542,7 +2698,7 @@
         },
         "compileOnly": true
       },
-      "System.Text.Encoding.Extensions/4.1.2.0": {
+      "System.Text.Encoding.Extensions.Reference/4.1.2.0": {
         "compile": {
           "System.Text.Encoding.Extensions.dll": {}
         },
@@ -2560,7 +2716,7 @@
         },
         "compileOnly": true
       },
-      "System.Text.RegularExpressions/4.2.2.0": {
+      "System.Text.RegularExpressions.Reference/4.2.2.0": {
         "compile": {
           "System.Text.RegularExpressions.dll": {}
         },
@@ -2596,7 +2752,7 @@
         },
         "compileOnly": true
       },
-      "System.Threading.Tasks.Extensions/4.3.1.0": {
+      "System.Threading.Tasks.Extensions.Reference/4.3.1.0": {
         "compile": {
           "System.Threading.Tasks.Extensions.dll": {}
         },
@@ -2680,7 +2836,7 @@
         },
         "compileOnly": true
       },
-      "System.Xml.ReaderWriter/4.2.2.0": {
+      "System.Xml.ReaderWriter.Reference/4.2.2.0": {
         "compile": {
           "System.Xml.ReaderWriter.dll": {}
         },
@@ -2735,6 +2891,27 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "ClosedXML/0.95.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-YixFPzUJ4Ni2AaW/FbPgzFvdtjIzE/4NKROwI1RqIQHWka7QN9Spt4sHuXaSk9PLmXBkk8newHGW0UWLcLs5GA==",
+      "path": "closedxml/0.95.4",
+      "hashPath": "closedxml.0.95.4.nupkg.sha512"
+    },
+    "DocumentFormat.OpenXml/2.7.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-tWT7iu0ab9PNoMTWjv24rt+qnyqvcnPOYs167vPnk4aegAYSAxoUjwNW+VxY8xoLtJntQ/JlWTi7Vt+8TghLlQ==",
+      "path": "documentformat.openxml/2.7.2",
+      "hashPath": "documentformat.openxml.2.7.2.nupkg.sha512"
+    },
+    "ExcelNumberFormat/1.0.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-dRx817M5t0sv4GCJyAXU8qmhFXcqRpCHzLpxNmkMWTvzlfE0/KM7BNk6qEble0ffAr4xT7RyU7s/HpovVlA/9g==",
+      "path": "excelnumberformat/1.0.10",
+      "hashPath": "excelnumberformat.1.0.10.nupkg.sha512"
     },
     "JWT/8.0.0": {
       "type": "package",
@@ -2974,6 +3151,20 @@
       "path": "microsoft.netcore.targets/1.1.0",
       "hashPath": "microsoft.netcore.targets.1.1.0.nupkg.sha512"
     },
+    "Microsoft.Office.Interop.Excel/14.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-leYFjthpl/Aac6l2EgvMtb/3RDjuphVktBOCjZMsgQX6x8Cr+Uob1uOlSy5ziQURf4YHFGQwZra8rGY1iVT5oQ==",
+      "path": "microsoft.office.interop.excel/14.0.0",
+      "hashPath": "microsoft.office.interop.excel.14.0.0.nupkg.sha512"
+    },
+    "Microsoft.Win32.SystemEvents/4.5.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-LuI1oG+24TUj1ZRQQjM5Ew73BKnZE5NZ/7eAdh1o8ST5dPhUnJvIkiIn2re3MwnkRy6ELRnvEbBxHP8uALKhJw==",
+      "path": "microsoft.win32.systemevents/4.5.0",
+      "hashPath": "microsoft.win32.systemevents.4.5.0.nupkg.sha512"
+    },
     "MimeKit/2.10.1": {
       "type": "package",
       "serviceable": true,
@@ -3191,6 +3382,13 @@
       "path": "system.diagnostics.tracing/4.3.0",
       "hashPath": "system.diagnostics.tracing.4.3.0.nupkg.sha512"
     },
+    "System.Drawing.Common/4.5.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-AiJFxxVPdeITstiRS5aAu8+8Dpf5NawTMoapZ53Gfirml24p7HIfhjmCRxdXnmmf3IUA3AX3CcW7G73CjWxW/Q==",
+      "path": "system.drawing.common/4.5.0",
+      "hashPath": "system.drawing.common.4.5.0.nupkg.sha512"
+    },
     "System.Globalization/4.3.0": {
       "type": "package",
       "serviceable": true,
@@ -3218,6 +3416,27 @@
       "sha512": "sha512-YHndyoiV90iu4iKG115ibkhrG+S3jBm8Ap9OwoUAzO5oPDAWcr0SFwQFm0HjM8WkEZWo0zvLTyLmbvTkW1bXgg==",
       "path": "system.io.compression/4.3.0",
       "hashPath": "system.io.compression.4.3.0.nupkg.sha512"
+    },
+    "System.IO.FileSystem/4.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-IBErlVq5jOggAD69bg1t0pJcHaDbJbWNUZTPI96fkYWzwYbN6D9wRHMULLDd9dHsl7C2YsxXL31LMfPI1SWt8w==",
+      "path": "system.io.filesystem/4.0.1",
+      "hashPath": "system.io.filesystem.4.0.1.nupkg.sha512"
+    },
+    "System.IO.FileSystem.Primitives/4.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-kWkKD203JJKxJeE74p8aF8y4Qc9r9WQx4C0cHzHPrY3fv/L/IhWnyCHaFJ3H1QPOH6A93whlQ2vG5nHlBDvzWQ==",
+      "path": "system.io.filesystem.primitives/4.0.1",
+      "hashPath": "system.io.filesystem.primitives.4.0.1.nupkg.sha512"
+    },
+    "System.IO.Packaging/4.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-taPqPWcAj/h6e/c+zIWIVe1ddJtpV6acC6g9GpolxUcIwUaH6zc0ZbFS8kkVzBkuWv76pMalKeTzfmHtfT1pXA==",
+      "path": "system.io.packaging/4.0.0",
+      "hashPath": "system.io.packaging.4.0.0.nupkg.sha512"
     },
     "System.Linq/4.3.0": {
       "type": "package",
@@ -3345,6 +3564,20 @@
       "path": "system.text.encoding.codepages/4.4.0",
       "hashPath": "system.text.encoding.codepages.4.4.0.nupkg.sha512"
     },
+    "System.Text.Encoding.Extensions/4.0.11": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-jtbiTDtvfLYgXn8PTfWI+SiBs51rrmO4AAckx4KR6vFK9Wzf6tI8kcRdsYQNwriUeQ1+CtQbM1W4cMbLXnj/OQ==",
+      "path": "system.text.encoding.extensions/4.0.11",
+      "hashPath": "system.text.encoding.extensions.4.0.11.nupkg.sha512"
+    },
+    "System.Text.RegularExpressions/4.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-i88YCXpRTjCnoSQZtdlHkAOx4KNNik4hMy83n0+Ftlb7jvV6ZiZWMpnEZHhjBp6hQVh8gWd/iKNPzlPF7iyA2g==",
+      "path": "system.text.regularexpressions/4.1.0",
+      "hashPath": "system.text.regularexpressions.4.1.0.nupkg.sha512"
+    },
     "System.Threading/4.3.0": {
       "type": "package",
       "serviceable": true,
@@ -3358,6 +3591,20 @@
       "sha512": "sha512-LbSxKEdOUhVe8BezB/9uOGGppt+nZf6e1VFyw6v3DN6lqitm0OSn2uXMOdtP0M3W4iMcqcivm2J6UgqiwwnXiA==",
       "path": "system.threading.tasks/4.3.0",
       "hashPath": "system.threading.tasks.4.3.0.nupkg.sha512"
+    },
+    "System.Threading.Tasks.Extensions/4.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pH4FZDsZQ/WmgJtN4LWYmRdJAEeVkyriSwrv2Teoe5FOU0Yxlb6II6GL8dBPOfRmutHGATduj3ooMt7dJ2+i+w==",
+      "path": "system.threading.tasks.extensions/4.0.0",
+      "hashPath": "system.threading.tasks.extensions.4.0.0.nupkg.sha512"
+    },
+    "System.Xml.ReaderWriter/4.0.11": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ZIiLPsf67YZ9zgr31vzrFaYQqxRPX9cVHjtPSnmx4eN6lbS/yEyYNr2vs1doGDEscF0tjCZFsk9yUg1sC9e8tg==",
+      "path": "system.xml.readerwriter/4.0.11",
+      "hashPath": "system.xml.readerwriter.4.0.11.nupkg.sha512"
     },
     "Microsoft.AspNetCore.Antiforgery/3.1.0.0": {
       "type": "referenceassembly",
@@ -4149,7 +4396,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "System.IO.FileSystem/4.1.2.0": {
+    "System.IO.FileSystem.Reference/4.1.2.0": {
       "type": "referenceassembly",
       "serviceable": false,
       "sha512": ""
@@ -4159,7 +4406,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "System.IO.FileSystem.Primitives/4.1.2.0": {
+    "System.IO.FileSystem.Primitives.Reference/4.1.2.0": {
       "type": "referenceassembly",
       "serviceable": false,
       "sha512": ""
@@ -4549,7 +4796,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "System.Text.Encoding.Extensions/4.1.2.0": {
+    "System.Text.Encoding.Extensions.Reference/4.1.2.0": {
       "type": "referenceassembly",
       "serviceable": false,
       "sha512": ""
@@ -4564,7 +4811,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "System.Text.RegularExpressions/4.2.2.0": {
+    "System.Text.RegularExpressions.Reference/4.2.2.0": {
       "type": "referenceassembly",
       "serviceable": false,
       "sha512": ""
@@ -4594,7 +4841,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "System.Threading.Tasks.Extensions/4.3.1.0": {
+    "System.Threading.Tasks.Extensions.Reference/4.3.1.0": {
       "type": "referenceassembly",
       "serviceable": false,
       "sha512": ""
@@ -4664,7 +4911,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "System.Xml.ReaderWriter/4.2.2.0": {
+    "System.Xml.ReaderWriter.Reference/4.2.2.0": {
       "type": "referenceassembly",
       "serviceable": false,
       "sha512": ""

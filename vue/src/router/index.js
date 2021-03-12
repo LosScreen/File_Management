@@ -6,6 +6,7 @@ import Login from "../views/Login.vue";
 import Photo from "../views/Photo.vue";
 import PhotoShare from "../views/Share/PhotoShare.vue";
 import Share from "../views/Share.vue";
+import Report from "../views/Report.vue";
 
 Vue.use(VueRouter);
 
@@ -54,6 +55,11 @@ const routes = [
     path: "/Share/:id?/:namefile?",
     name: "Share",
     component: Share
+  },
+  {
+    path: "/Report",
+    name: "Report",
+    component: Report
   }
 ];
 
