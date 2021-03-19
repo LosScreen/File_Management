@@ -75,7 +75,7 @@
                   "
                 >
                   <i
-                    class="fas fa-lock"
+                    class="fas fa-envelope"
                     style="color: gray; margin-right: 10px"
                   ></i>
                   <input

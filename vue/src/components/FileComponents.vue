@@ -193,6 +193,7 @@ export default {
             // console.log(res);
             this.ModalShare = false;
             this.UserNameShare = '';
+            alert("แชร์ไฟล์สำเร็จ");
           })
           .catch((error) => {
             console.log(error);
@@ -294,6 +295,7 @@ export default {
         .then(() => {
           // console.log("Okay");
           this.getData();
+          alert("ลบโฟลเดอร์สำเร็จ");
         })
         .catch((error) => {
           console.log(error);
@@ -310,6 +312,7 @@ export default {
         .then(() => {
           // console.log("Okay");
           this.getData();
+          alert("ลบไฟล์สำเร็จ");
         })
         .catch((error) => {
           console.log(error);

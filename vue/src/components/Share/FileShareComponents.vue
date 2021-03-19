@@ -258,8 +258,9 @@ export default {
       this.$axios
         .post("DataFile/deleteFolder", this.dataFile)
         .then(() => {
-          console.log("Okay");
+          // console.log("Okay");
           this.getData();
+          alert("ลบโฟลเดอร์สำเร็จ");
         })
         .catch((error) => {
           console.log(error);
@@ -269,11 +270,12 @@ export default {
       this.$axios
         .post("DataFile/deleteFile", this.dataFile)
         .then(() => {
-          console.log("Okay");
+          // console.log("Okay");
           this.getData();
         })
         .catch((error) => {
           console.log(error);
+          alert("ลบไฟล์สำเร็จ");
         });
     },
   getAllData(){

@@ -12,7 +12,7 @@ Vue.config.productionTip = false;
 Vue.component("Modal", VueModal);
 const axiosInstance = axios.create({
   baseURL: "http://localhost:5000/",
-  timeout: 1000,
+  timeout: 2000,
   headers: { "X-Custom-Header": "foobar", "Content-Type": "application/json" },
 });
 Vue.prototype.$axios = axiosInstance;

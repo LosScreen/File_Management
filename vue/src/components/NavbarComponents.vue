@@ -74,7 +74,7 @@ export default {
         })
         .catch((error) => {
           console.error(error);
-          console.log("error");
+          // console.log("error");
         });
     },
     getData() {
@@ -110,7 +110,7 @@ export default {
         })
         .catch((error) => {
           console.error(error);
-          console.log("error");
+          // console.log("error");
         });
     },
     Home() {
@@ -129,11 +129,14 @@ export default {
       // var a = {i:0,b:1}
       if (this.searchText != "") {
         this.$store.state.dataFile = [];
+        // || data.nameFile.indexOf(this.searchText) != -1 || data.nameFile.indexOf(this.searchText.toUpperCase()) != -1
         this.$store.state.allDataFile.forEach((data) => {
-          if (data.nameFile.indexOf(this.searchText.toLowerCase()) != -1) {
-            console.log("เจออยู่จ้า");
+          if (data.nameFile.toLowerCase().indexOf(this.searchText.toLowerCase()) != -1) {
+            // console.log("เจออยู่จ้า");
             this.$store.state.dataFile.push(data);
+            // console.log(this.$store.state.dataFile);
           }
+          // console.log(this.$store.state.allDataFile);
         });
       } else if (this.searchText == "") {
         // console.log("เข้ามาแล้ว");

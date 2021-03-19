@@ -69,7 +69,7 @@
             padding-top: 10px
             ">
             
-      <button class="btn btn-success" style="margin-bottom:10px" v-on:click="submitFile()">Submit</button>
+      <button class="btn btn-success" style="margin-bottom:10px" v-on:click="submitFile()">Upload</button>
       </div>
     </Modal>
   </div>
