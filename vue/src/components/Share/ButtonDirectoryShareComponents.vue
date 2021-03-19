@@ -9,7 +9,7 @@
     <div
       style="margin: auto"
     >
-      <button class="btn btn-dark" style="height: auto" @click="beforeDirectory()">Back</button>
+      <button v-if="this.$route.params.id!=undefined" class="btn btn-dark" style="height: auto" @click="beforeDirectory()">Back</button>
     </div>
   </div>
 </template>

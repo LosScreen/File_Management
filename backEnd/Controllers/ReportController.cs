@@ -77,17 +77,13 @@ namespace backEnd.Controllers
     new Author { Id = 2, FirstName = "Steve", LastName = "Smith" },
     new Author { Id = 3, FirstName = "Anand", LastName = "Narayaswamy"}
 };
+                string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                string fileName = "authors.xlsx";
             try
             {
                 var db = new ConMySQL();
                 db.Open();
 
-
-
-
-
-                string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                string fileName = "authors.xlsx";
 
                 if (Username != "All")
                 {
@@ -113,6 +109,8 @@ namespace backEnd.Controllers
 
                         int index = 1;
 
+
+                        
                         string sqlFileOwner = $"SELECT * FROM DataFile Where IdUser = '{objUser.id}' and Share = '0'";
                         System.Data.DataTable SqlDataFileOwner = db.get(sqlFileOwner);
                         foreach (DataRow dr in SqlDataFileOwner.Rows)
@@ -125,31 +123,67 @@ namespace backEnd.Controllers
                         index+=2;
                         worksheet.Cell(index, 1).Value = "File(Share)";
                         worksheet.Cell(index, 2).Value = "File(Share TO)";
-                         worksheet.Cell(index, 1).Value += "eiei";
+                        //  worksheet.Cell(index, 1).Value += "eiei";
+                        // index++;
 
-                        string sqlFileShare = $"SELECT * FROM DataFile Where IdUser = '{objUser.id}' and Share != '0'";
-                        System.Data.DataTable SqlDataFileShare = db.get(sqlFileShare);
-                        foreach (DataRow dr in SqlDataFileShare.Rows)
+                        // string namefilearr = null;
+
+
+                        //edit
+                        string sqlFileShare1 = $"SELECT * FROM DataFile Where IdUser = '{objUser.id}' and Share = '0'";
+                        System.Data.DataTable SqlDataFileShare1 = db.get(sqlFileShare1);
+
+                        string sqlFileShare2 = $"SELECT * FROM DataFile Where IdUser = '{objUser.id}' and Share != '0'";
+                        System.Data.DataTable SqlDataFileShare2 = db.get(sqlFileShare2);
+                        
+                        foreach (DataRow dr in SqlDataFileShare1.Rows)
                         {
                             var x = 0;
-                           foreach (DataRow dt in SqlDataFileShare.Rows){
-                               if (Convert.ToInt32(dr["mainfolder"]) == Convert.ToInt32(dt["mainfolder"]) && Convert.ToInt32(dr["share"]) != Convert.ToInt32(dt["share"])) {
-                                   
+                           foreach (DataRow dt in SqlDataFileShare2.Rows){
+                               if (Convert.ToInt32(dr["id"]) == Convert.ToInt32(dt["mainfolder"]) && Convert.ToInt32(dr["share"]) != Convert.ToInt32(dt["share"])) {
                                    if(x == 0){
-                                    worksheet.Cell(index, 2).Value = Convert.ToInt32(dr["share"]) + ", " + Convert.ToInt32(dt["share"]);
+                                    worksheet.Cell(index, 1).Value = dr["namefile"].ToString();
+                                    int drNum = Convert.ToInt32(dt["share"]);
+                                    string sqlUsernameShareTo = $"SELECT * FROM user Where Id = '{drNum}'";
+                                    System.Data.DataTable SqlDataFileShareTo = db.get(sqlUsernameShareTo);
+                                    // Console.WriteLine("index");
+                                    foreach (DataRow drTo in SqlDataFileShareTo.Rows)
+                                    {
+                                        worksheet.Cell(index, 2).Value = drTo["username"].ToString();
+
+                                        
+                                    }
+                                    // return Ok(SqlDataFileShareTo.Rows);
+                                    // Console.WriteLine(SqlDataFileShareTo.Rows.length);
+                                    // worksheet.Cell(index, 2).Value = Convert.ToInt32(dr["share"]) + ", " + Convert.ToInt32(dt["share"]);
                                    }else{
-                                    worksheet.Cell(index, 2).Value += ", " + Convert.ToInt32(dt["share"]);
+                                    int drNum = Convert.ToInt32(dt["share"]);
+                                    string sqlUsernameShareTo1 = $"SELECT * FROM user Where Id = '{drNum}'";
+                                    System.Data.DataTable SqlDataFileShareTo1 = db.get(sqlUsernameShareTo1);
+                                    foreach (DataRow dr1 in SqlDataFileShareTo1.Rows)
+                                    {
+                                        worksheet.Cell(index, 2).Value += ", " + dr1["username"].ToString();
+                                    }          
+                                    // worksheet.Cell(index, 2).Value += ", " + Convert.ToInt32(dt["share"]);
                                    }
                                    x++;
                                }
                                
                            }
-                            worksheet.Cell(index + 1, 1).Value = dr["namefile"].ToString();
-                            worksheet.Cell(index + 1, 2).Value = Convert.ToInt32(dr["share"]);
+                            //edit2
+                        //     int IdUsernameShare = Convert.ToInt32(dr["share"]);
+                        //     string sqlUsernameShareTo = $"SELECT * FROM user Where Id = '{IdUsernameShare}'";
+                        //     System.Data.DataTable SqlDataFileShareTo = db.get(sqlUsernameShareTo);
+                        //     foreach (DataRow datar in SqlDataFileShareTo.Rows)
+                        // {
+                        //     worksheet.Cell(index, 2).Value = datar["username"].ToString();
+                        // }
+
+                            // worksheet.Cell(index + 1, 2).Value = Convert.ToInt32(dr["share"]);
 
                            index++;
                         }
-                        index+=2;
+                        index+=1;
                         worksheet.Cell(index, 1).Value = "File(Receiver Share)";
                         worksheet.Cell(index, 2).Value = "File(Share From)";
 
@@ -158,7 +192,15 @@ namespace backEnd.Controllers
                         foreach (DataRow dr in SqlDataFileReceiverShare.Rows)
                         {
                             worksheet.Cell(index + 1, 1).Value = dr["namefile"].ToString();
-                            worksheet.Cell(index + 1, 2).Value = Convert.ToInt32(dr["IdUser"]);
+
+                            int drNum = Convert.ToInt32(dr["IdUser"]);
+                                    string sqlUsernameShareTo1 = $"SELECT * FROM user Where Id = '{drNum}'";
+                                    System.Data.DataTable SqlDataFileShareTo1 = db.get(sqlUsernameShareTo1);
+                                    foreach (DataRow dr1 in SqlDataFileShareTo1.Rows)
+                                    {
+                                        worksheet.Cell(index + 1, 2).Value = dr1["username"].ToString();
+                                    }          
+                            // worksheet.Cell(index + 1, 2).Value = Convert.ToInt32(dr["IdUser"]);
 
 
                             index++;
@@ -181,6 +223,158 @@ namespace backEnd.Controllers
                             return File(content, contentType, fileName);
                         }
                     }
+                }else if (Username == "All"){
+                    // Console.WriteLine("Key");
+                   string sqlAllUsername = $"SELECT * FROM user";
+                    System.Data.DataTable SqlDataAllUsername = db.get(sqlAllUsername);
+                    var workbook = new XLWorkbook();
+                    foreach (DataRow drAll in SqlDataAllUsername.Rows){
+
+                    string name = drAll["username"].ToString();
+                    Console.WriteLine(name);
+                    string sqlUser = $"SELECT * FROM User Where UserName = '{name}'";
+
+                    System.Data.DataTable SqlData = db.get(sqlUser);
+                    User objUser = new User();
+                    foreach (DataRow dr in SqlData.Rows)
+                    {
+                        objUser.id = Convert.ToInt32(dr["id"]);
+                    }
+
+
+
+                    //edit
+                    // var workbook = new XLWorkbook();
+                    
+                        IXLWorksheet worksheet =
+                        workbook.Worksheets.Add(name);
+                        worksheet.Cell(1, 1).Value = "File(Owner)";
+                        // worksheet.Cell(1, 2).Value = "File(Share)";
+                        // worksheet.Cell(1, 3).Value = "File(receiver Share)";
+
+                        int index = 1;
+
+
+                        
+                        string sqlFileOwner = $"SELECT * FROM DataFile Where IdUser = '{objUser.id}' and Share = '0'";
+                        System.Data.DataTable SqlDataFileOwner = db.get(sqlFileOwner);
+                        foreach (DataRow dr in SqlDataFileOwner.Rows)
+                        {
+                            worksheet.Cell(index + 1, 1).Value = dr["namefile"].ToString();
+
+
+                            index++;
+                        }
+                        index+=2;
+                        worksheet.Cell(index, 1).Value = "File(Share)";
+                        worksheet.Cell(index, 2).Value = "File(Share TO)";
+                        //  worksheet.Cell(index, 1).Value += "eiei";
+                        // index++;
+
+                        // string namefilearr = null;
+
+
+                        //edit
+                        string sqlFileShare1 = $"SELECT * FROM DataFile Where IdUser = '{objUser.id}' and Share = '0'";
+                        System.Data.DataTable SqlDataFileShare1 = db.get(sqlFileShare1);
+
+                        string sqlFileShare2 = $"SELECT * FROM DataFile Where IdUser = '{objUser.id}' and Share != '0'";
+                        System.Data.DataTable SqlDataFileShare2 = db.get(sqlFileShare2);
+                        
+                        foreach (DataRow dr in SqlDataFileShare1.Rows)
+                        {
+                            var x = 0;
+                           foreach (DataRow dt in SqlDataFileShare2.Rows){
+                               if (Convert.ToInt32(dr["id"]) == Convert.ToInt32(dt["mainfolder"]) && Convert.ToInt32(dr["share"]) != Convert.ToInt32(dt["share"])) {
+                                   if(x == 0){
+                                    worksheet.Cell(index, 1).Value = dr["namefile"].ToString();
+                                    int drNum = Convert.ToInt32(dt["share"]);
+                                    string sqlUsernameShareTo = $"SELECT * FROM user Where Id = '{drNum}'";
+                                    System.Data.DataTable SqlDataFileShareTo = db.get(sqlUsernameShareTo);
+                                    // Console.WriteLine("index");
+                                    foreach (DataRow drTo in SqlDataFileShareTo.Rows)
+                                    {
+                                        worksheet.Cell(index, 2).Value = drTo["username"].ToString();
+
+                                        
+                                    }
+                                    // return Ok(SqlDataFileShareTo.Rows);
+                                    // Console.WriteLine(SqlDataFileShareTo.Rows.length);
+                                    // worksheet.Cell(index, 2).Value = Convert.ToInt32(dr["share"]) + ", " + Convert.ToInt32(dt["share"]);
+                                   }else{
+                                    int drNum = Convert.ToInt32(dt["share"]);
+                                    string sqlUsernameShareTo1 = $"SELECT * FROM user Where Id = '{drNum}'";
+                                    System.Data.DataTable SqlDataFileShareTo1 = db.get(sqlUsernameShareTo1);
+                                    foreach (DataRow dr1 in SqlDataFileShareTo1.Rows)
+                                    {
+                                        worksheet.Cell(index, 2).Value += ", " + dr1["username"].ToString();
+                                    }          
+                                    // worksheet.Cell(index, 2).Value += ", " + Convert.ToInt32(dt["share"]);
+                                   }
+                                   x++;
+                               }
+                               
+                           }
+                            //edit2
+                        //     int IdUsernameShare = Convert.ToInt32(dr["share"]);
+                        //     string sqlUsernameShareTo = $"SELECT * FROM user Where Id = '{IdUsernameShare}'";
+                        //     System.Data.DataTable SqlDataFileShareTo = db.get(sqlUsernameShareTo);
+                        //     foreach (DataRow datar in SqlDataFileShareTo.Rows)
+                        // {
+                        //     worksheet.Cell(index, 2).Value = datar["username"].ToString();
+                        // }
+
+                            // worksheet.Cell(index + 1, 2).Value = Convert.ToInt32(dr["share"]);
+
+                           index++;
+                        }
+                        index+=1;
+                        worksheet.Cell(index, 1).Value = "File(Receiver Share)";
+                        worksheet.Cell(index, 2).Value = "File(Share From)";
+
+                        string sqlFileReceiverShare = $"SELECT * FROM DataFile Where Share = '{objUser.id}'";
+                        System.Data.DataTable SqlDataFileReceiverShare = db.get(sqlFileReceiverShare);
+                        foreach (DataRow dr in SqlDataFileReceiverShare.Rows)
+                        {
+                            worksheet.Cell(index + 1, 1).Value = dr["namefile"].ToString();
+
+                            int drNum = Convert.ToInt32(dr["IdUser"]);
+                                    string sqlUsernameShareTo1 = $"SELECT * FROM user Where Id = '{drNum}'";
+                                    System.Data.DataTable SqlDataFileShareTo1 = db.get(sqlUsernameShareTo1);
+                                    foreach (DataRow dr1 in SqlDataFileShareTo1.Rows)
+                                    {
+                                        worksheet.Cell(index + 1, 2).Value = dr1["username"].ToString();
+                                    }          
+                            // worksheet.Cell(index + 1, 2).Value = Convert.ToInt32(dr["IdUser"]);
+
+
+                            index++;
+                        }
+
+
+
+
+
+                        //  worksheet.Cell(index + 1, 2).Value =
+                        //     authors[index - 1].FirstName;
+                        //     worksheet.Cell(index + 1, 3).Value =
+                        //     authors[index - 1].LastName;
+
+                        // return Ok(listFileOwner);
+                        // using (var stream = new MemoryStream())
+                        // {
+                        //     workbook.SaveAs(stream);
+                        //     var content = stream.ToArray();
+                        //     return File(content, contentType, fileName);
+                        // }
+                    
+                    }
+                    using (var stream = new MemoryStream())
+                        {
+                            workbook.SaveAs(stream);
+                            var content = stream.ToArray();
+                            return File(content, contentType, fileName);
+                        }
                 }
                 return Ok();
             }

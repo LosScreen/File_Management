@@ -24,14 +24,34 @@
         {{ name_Menu }}
       </li>
     </div>
-    
 
     <Modal v-model="ModalNewFolder" title="New Folder">
-      <label style="display: inline-block;">Name Folder</label>
-      <input style="display: inline-block; margin:0px 10px;" v-model="inPutPath" />
-      <button style="display: inline-block;" v-on:click="createFolderDate()">Yes</button>
+      <form v-on:submit.prevent="createFolderDate()">
+        <div class="row">
+          <label class="col" style="display: inline-block; padding-bottom:15px;">Name Folder</label>
+        </div>
+        <div class="row" style="padding-bottom:20px">
+          <input
+            class="col "
+            style="display: inline-block; margin: 0px 10px; height: 40px;"
+            v-model="inPutPath"
+          />
+        </div>
+        <div
+          class="d-flex-row"
+          style="
+            
+            text-align: right;
+            border-top: 1px solid #e5e5e5;
+            padding-top: 10px
+          "
+        >
+          <button class="btn btn-success" type="submit">Yes</button>
+        </div>
+      </form>
     </Modal>
-    <Modal v-model="Upload" title="My first modal">
+    <Modal v-model="Upload" title="Upload Files">
+      <div class="row" style="padding-bottom: 15px;">
       <label
         >File
         <input
@@ -43,8 +63,14 @@
       </label>
       <br />
       <progress max="100" :value.prop="uploadPercentage"></progress>
-      <br />
-      <button v-on:click="submitFile()">Submit</button>
+      </div>
+      <div class="d-flex-row" style="text-align: right;
+            border-top: 1px solid #e5e5e5;
+            padding-top: 10px
+            ">
+            
+      <button class="btn btn-success" style="margin-bottom:10px" v-on:click="submitFile()">Submit</button>
+      </div>
     </Modal>
   </div>
 </template>
@@ -53,58 +79,67 @@
 export default {
   components: {},
   methods: {
-    MyDrive(){
-      this.$router.push("/MyDrive/" +encodeURIComponent("/"+localStorage.Username));
-      this.$store.state.directory = ["Home"]
+    MyDrive() {
+      this.$router.push(
+        "/MyDrive/" + encodeURIComponent("/" + localStorage.Username)
+      );
+      this.$store.state.directory = ["Home"];
     },
-    ShareLink(){
+    ShareLink() {
       this.$router.push("/Share/");
-      this.$store.state.directory = ["Home"]
+      this.$store.state.directory = ["Home"];
     },
     submitFile() {
       // console.log(this.$store.state.dataFile.filter(item => item.nameFile == this.$refs.file.files[0].name).length);
-      if (this.$store.state.dataFile.filter(item => item.nameFile == this.$refs.file.files[0].name).length == 0){
-      let formData = new FormData();
-      formData.append("filedata", this.file);
-      // formData.append("iduser", localStorage.IdUser);
-      if (this.$store.state.path != "") {
-        formData.append("path",decodeURIComponent(this.$route.params.id));
-        // console.log(this.$store.state.path);
-      } else if (this.$store.state.path == "") {
-        formData.append("path","/"+localStorage.Username);
-      }
-      // console.log(formData.path);
-
-      for (var pair of formData.entries()) {
-    console.log(pair[0]+ ', ' + pair[1]); 
-}
-      // this.fileData.filedata = formData;
-      // this.fileData.path = this.$store.state.path;
-
-      this.$axios
-        .post("DataFile/putfile2", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization:
-              "Bearer " + localStorage.Token
-          },
-          onUploadProgress: function (progressEvent) {
-            this.uploadPercentage = parseInt(
-              Math.round((progressEvent.loaded / progressEvent.total) * 100)
-            );
-          }.bind(this),
-        })
-        .then(() => {
-          this.getData();
-          // console.log("SUCCESS!!");
-          this.Upload = false;
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-        }else if (this.$store.state.dataFile.filter(item => item.nameFile == this.$refs.file.files[0].name).length != 0){
-          alert("อัพโหลดไม่ได้จ้า");
+      if (
+        this.$store.state.dataFile.filter(
+          (item) => item.nameFile == this.$refs.file.files[0].name
+        ).length == 0
+      ) {
+        let formData = new FormData();
+        formData.append("filedata", this.file);
+        // formData.append("iduser", localStorage.IdUser);
+        if (this.$store.state.path != "") {
+          formData.append("path", decodeURIComponent(this.$route.params.id));
+          // console.log(this.$store.state.path);
+        } else if (this.$store.state.path == "") {
+          formData.append("path", "/" + localStorage.Username);
         }
+        // console.log(formData.path);
+
+        for (var pair of formData.entries()) {
+          console.log(pair[0] + ", " + pair[1]);
+        }
+        // this.fileData.filedata = formData;
+        // this.fileData.path = this.$store.state.path;
+
+        this.$axios
+          .post("DataFile/putfile2", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: "Bearer " + localStorage.Token,
+            },
+            onUploadProgress: function (progressEvent) {
+              this.uploadPercentage = parseInt(
+                Math.round((progressEvent.loaded / progressEvent.total) * 100)
+              );
+            }.bind(this),
+          })
+          .then(() => {
+            this.getData();
+            // console.log("SUCCESS!!");
+            this.Upload = false;
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      } else if (
+        this.$store.state.dataFile.filter(
+          (item) => item.nameFile == this.$refs.file.files[0].name
+        ).length != 0
+      ) {
+        alert("อัพโหลดไม่ได้จ้า");
+      }
     },
     handleFileUpload() {
       // console.log(this.$refs.file.files[0].name);
@@ -116,53 +151,60 @@ export default {
     createFolderDate() {
       // var arr=this.$store.state.dataFile.filter(item => item.nameFile == this.inPutPath);
       // console.log(arr.length);
-      if(this.$store.state.dataFile.filter(item => item.nameFile == this.inPutPath).length != 0){
-        alert("สร้างไม่ได้จ้า")
-      }else if (this.$store.state.dataFile.filter(item => item.nameFile == this.inPutPath).length == 0){
-      // this.$store.state.dataFile.forEach(data => {
-      //   // console.log(data.nameFile);
-      // });
-      // console.log(this.$store.state.dataFile);
-      this.New_Folder.NameFile = this.inPutPath;
-      // this.New_Folder.IdUser = localStorage.IdUser;
-      // console.log(this.$store.state.path);
-      if (this.$store.state.path == "") {
-        this.New_Folder.Path = "/uploads/"+localStorage.Username;
-        // console.log("!");
-      } else if (this.$store.state.path != "") {
-        this.New_Folder.Path = "/uploads"+ decodeURIComponent(this.$route.params.id);
-        // console.log("2");
-      }
-      // console.log(this.$store.state.directory);
-      if (this.$store.state.NameFile != "") {
-
-        this.$axios
-          .post("DataFile/createfolder", this.New_Folder, {
-          headers: {
-            Authorization:
-              "Bearer " + localStorage.Token,
-          },
-        })
-          .then(() => {
-            this.getData();
-            this.ModalNewFolder = false;
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      } else {
-        alert("Name Folder is Null");
-      }
+      if (
+        this.$store.state.dataFile.filter(
+          (item) => item.nameFile == this.inPutPath
+        ).length != 0
+      ) {
+        alert("สร้างไม่ได้จ้า");
+      } else if (
+        this.$store.state.dataFile.filter(
+          (item) => item.nameFile == this.inPutPath
+        ).length == 0
+      ) {
+        // this.$store.state.dataFile.forEach(data => {
+        //   // console.log(data.nameFile);
+        // });
+        // console.log(this.$store.state.dataFile);
+        this.New_Folder.NameFile = this.inPutPath;
+        // this.New_Folder.IdUser = localStorage.IdUser;
+        // console.log(this.$store.state.path);
+        if (this.$store.state.path == "") {
+          this.New_Folder.Path = "/uploads/" + localStorage.Username;
+          // console.log("!");
+        } else if (this.$store.state.path != "") {
+          this.New_Folder.Path =
+            "/uploads" + decodeURIComponent(this.$route.params.id);
+          // console.log("2");
+        }
+        // console.log(this.$store.state.directory);
+        if (this.$store.state.NameFile != "") {
+          this.$axios
+            .post("DataFile/createfolder", this.New_Folder, {
+              headers: {
+                Authorization: "Bearer " + localStorage.Token,
+              },
+            })
+            .then(() => {
+              this.getData();
+              this.ModalNewFolder = false;
+              this.inPutPath = '';
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+        } else {
+          alert("Name Folder is Null");
+        }
       }
     },
-    getAllData(){
-      this.GetAllData.path = "/uploads/"
+    getAllData() {
+      this.GetAllData.path = "/uploads/";
       console.log(this.GetData);
       this.$axios
         .post("DataFile/GetAllDataFiles", this.GetAllData, {
           headers: {
-            Authorization:
-              "Bearer " + localStorage.Token,
+            Authorization: "Bearer " + localStorage.Token,
           },
         })
         .then((response) => {
@@ -174,10 +216,10 @@ export default {
         });
     },
     getData() {
-      this.GetData.path = "/uploads/"+localStorage.Username;
+      this.GetData.path = "/uploads/" + localStorage.Username;
       // this.GetData.iduser =localStorage.IdUser;
       if (this.$store.state.path == "") {
-        this.GetData.path = "/uploads/"+localStorage.Username;
+        this.GetData.path = "/uploads/" + localStorage.Username;
       } else {
         this.GetData.path += this.$store.state.path;
         // console.log(this.pathFile.path);
@@ -188,14 +230,13 @@ export default {
       this.$axios
         .post("DataFile/getdata", this.GetData, {
           headers: {
-            Authorization:
-              "Bearer " + localStorage.Token,
+            Authorization: "Bearer " + localStorage.Token,
           },
         })
         .then((response) => {
           this.$store.state.dataFile = response.data;
           this.$store.state.defaultDataFile = response.data;
-            // console.log(this.dataFile);
+          // console.log(this.dataFile);
           this.getAllData();
         })
         .catch((error) => {
@@ -210,10 +251,10 @@ export default {
   },
   data() {
     return {
-      GetAllData:{
+      GetAllData: {
         path: undefined,
       },
-      Testdata:{
+      Testdata: {
         NameFile: "Test",
         Path: "/uploads/asd",
       },
@@ -223,7 +264,7 @@ export default {
       pathFile: {
         path: "/uploads",
       },
-      GetData:{
+      GetData: {
         path: "",
         iduser: 24,
       },
@@ -269,5 +310,19 @@ export default {
 
 .button:hover {
   background-color: rgb(236, 236, 236);
+}
+
+.text_box {
+  border: none;
+  height: 100%;
+  width: 90%;
+  border-radius: 25px;
+  background: none;
+}
+.text_box:focus {
+  outline: 0;
+}
+.vm-content{
+  padding: 10px 15px 1px 15px !important;
 }
 </style>

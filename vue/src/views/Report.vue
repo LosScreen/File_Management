@@ -7,7 +7,6 @@
       <option v-for="(data, inx) in this.userArry" :key="inx">{{
         data.userName
       }}</option>
-      <option>C</option>
     </select>
     <span>Selected: {{ selected }}</span>
     <button @click="report">OK</button>
@@ -35,6 +34,7 @@ export default {
         .get("api/report/ReportExcel/"+ this.selected,{ responseType: "blob" })
         .then((res) => {
           FileDownload(res.data, this.selected+".xlsx","application/excel");
+          // console.log(res.data);
         })
         .catch((error) => {
           console.error(error);

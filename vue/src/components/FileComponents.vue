@@ -121,10 +121,30 @@
         <a href="#" @click.prevent="removeFile()">Remove File</a>
       </li>
     </vue-context>
-    <Modal v-model="ModalShare" title="My first modal">
-      <label>UserName</label>
-      <input v-model="UserNameShare" /><br />
-      <button v-on:click="Share(dataFile)">Yes</button>
+    <Modal v-model="ModalShare" title="Share Files">
+      <form v-on:submit.prevent="Share(dataFile)">
+        <div class="row">
+          <label class="col" style="display: inline-block; padding-bottom:15px;">UserName</label>
+        </div>
+        <div class="row" style="padding-bottom:20px">
+          <input
+            class="col "
+            style="display: inline-block; margin: 0px 10px; height: 40px;"
+            v-model="UserNameShare"
+          />
+        </div>
+        <div
+          class="d-flex-row"
+          style="
+            
+            text-align: right;
+            border-top: 1px solid #e5e5e5;
+            padding-top: 10px
+          "
+        >
+          <button class="btn btn-success" type="submit">Yes</button>
+        </div>
+      </form>
     </Modal>
 
 
@@ -172,10 +192,13 @@ export default {
             console.log(res.data);
             // console.log(res);
             this.ModalShare = false;
+            this.UserNameShare = '';
           })
           .catch((error) => {
             console.log(error);
           });
+          this.ModalShare = false;
+            this.UserNameShare = '';
       }else{
         alert("ชื่อ User ตัวเองจ้าาา");
       }

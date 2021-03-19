@@ -14,7 +14,7 @@
             class="col-11 col-xl-5 col-lg-6 col-md-8 col-sm-10 text-center form p-4 div_right"
             style=""
           >
-          <form class="form" style="background-color:none;" v-on:submit.prevent="">
+          <form class="form" style="background-color:none;" v-on:submit.prevent="Register()">
             <h1 class="" style="color: black">Create Account</h1>
             <div class="px-2">
               <!-- <form action="" class="justify-content-center"> -->
@@ -36,6 +36,8 @@
                     class="text_box"
                     v-model="UserData.userName"
                     placeholder="Username" 
+                    type="text"
+                    required
                   />
                 </div>
               </div>
@@ -58,6 +60,7 @@
                     class="text_box"
                     v-model="UserData.passWord"
                     placeholder="Password"
+                    required
                     
                   />
                 </div>
@@ -81,12 +84,13 @@
                     class="text_box"
                     v-model="UserData.email"
                     placeholder="Email"
+                    required
                     
                   />
                 </div>
               </div>
               <div class="row">
-                <button @click="Register()" class="botton_Register_Main">Register</button>
+                <button type="submit" class="botton_Register_Main">Register</button>
                  <a class="botton_Login_Sup" style="color:gray; margin-top:10px" @click="Login()">Login</a>
               </div>
               <!-- </form> -->

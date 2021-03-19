@@ -23,6 +23,35 @@ using MailKit;
 using MimeKit;
 using MimeKit.Text;
 
+// int drNum = Convert.ToInt32(dr["share"]);
+//                                     string sqlUsernameShareTo1 = $"SELECT * FROM user Where Id = '{drNum}'";
+//                                     System.Data.DataTable SqlDataFileShareTo1 = db.get(sqlUsernameShareTo1);
+//                                     foreach (DataRow dr1 in SqlDataFileShareTo1.Rows)
+//                                     {
+//                                         worksheet.Cell(index, 2).Value = dr1["username"].ToString();
+//                                     }            
+
+
+//                                     worksheet.Cell(index, 2).Value += ", ";
+
+//                                     int dtNum = Convert.ToInt32(dt["share"]);
+//                                     string sqlUsernameShareTo2 = $"SELECT * FROM user Where Id = '{dtNum}'";
+//                                     System.Data.DataTable SqlDataFileShareTo2 = db.get(sqlUsernameShareTo2);
+//                                     foreach (DataRow dr2 in SqlDataFileShareTo2.Rows)
+//                                     {
+//                                         worksheet.Cell(index, 2).Value += dr2["username"].ToString();
+//                                     }            
+
+
+
+// worksheet.Cell(index, 2).Value += dr1["username"].ToString();
+
+// string sqlAllUsername = $"SELECT * FROM user";
+//                     System.Data.DataTable SqlDataAllUsername = db.get(sqlAllUsername);
+//                     foreach (DataRow drAll in SqlDataAllUsername.Rows){
+
+//                     string name = drAll["username"].ToString();
+//                     string sqlUser = $"SELECT * FROM User Where UserName = '{name}'";
 namespace backEnd.Controllers
 {
     [Route("api/[controller]")]
