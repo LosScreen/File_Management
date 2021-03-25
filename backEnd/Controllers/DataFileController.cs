@@ -278,6 +278,7 @@ namespace backEnd.Controllers
         [Route("putfile")]
         public IEnumerable<ActionResult<ResponseErr>> UploadDataFile([FromForm] DataFile datafile)
         {
+            //ไม่ได้ใช้
             dynamic rs = new System.Dynamic.ExpandoObject();
             // rs.filedata_0 = Newtonsoft.Json.JsonConvert.SerializeObject(datafile.filedata[0]);
             Console.WriteLine(datafile.filedata.Count);
