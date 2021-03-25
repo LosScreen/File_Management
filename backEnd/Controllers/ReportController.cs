@@ -115,7 +115,7 @@ namespace backEnd.Controllers
                         System.Data.DataTable SqlDataFileOwner = db.get(sqlFileOwner);
                         foreach (DataRow dr in SqlDataFileOwner.Rows)
                         {
-                            worksheet.Cell(index + 1, 1).Value = dr["namefile"].ToString();
+                            worksheet.Cell(index + 1, 1).Value = dr["path"].ToString() + "/" + dr["namefile"].ToString();
 
 
                             index++;
@@ -142,7 +142,7 @@ namespace backEnd.Controllers
                            foreach (DataRow dt in SqlDataFileShare2.Rows){
                                if (Convert.ToInt32(dr["id"]) == Convert.ToInt32(dt["mainfolder"]) && Convert.ToInt32(dr["share"]) != Convert.ToInt32(dt["share"])) {
                                    if(x == 0){
-                                    worksheet.Cell(index, 1).Value = dr["namefile"].ToString();
+                                    worksheet.Cell(index, 1).Value = dr["path"].ToString() + "/" + dr["namefile"].ToString();
                                     int drNum = Convert.ToInt32(dt["share"]);
                                     string sqlUsernameShareTo = $"SELECT * FROM user Where Id = '{drNum}'";
                                     System.Data.DataTable SqlDataFileShareTo = db.get(sqlUsernameShareTo);
@@ -191,7 +191,7 @@ namespace backEnd.Controllers
                         System.Data.DataTable SqlDataFileReceiverShare = db.get(sqlFileReceiverShare);
                         foreach (DataRow dr in SqlDataFileReceiverShare.Rows)
                         {
-                            worksheet.Cell(index + 1, 1).Value = dr["namefile"].ToString();
+                            worksheet.Cell(index + 1, 1).Value = dr["path"].ToString() + "/" + dr["namefile"].ToString();
 
                             int drNum = Convert.ToInt32(dr["IdUser"]);
                                     string sqlUsernameShareTo1 = $"SELECT * FROM user Where Id = '{drNum}'";
@@ -231,7 +231,7 @@ namespace backEnd.Controllers
                     foreach (DataRow drAll in SqlDataAllUsername.Rows){
 
                     string name = drAll["username"].ToString();
-                    Console.WriteLine(name);
+                    // Console.WriteLine(name);
                     string sqlUser = $"SELECT * FROM User Where UserName = '{name}'";
 
                     System.Data.DataTable SqlData = db.get(sqlUser);
@@ -260,7 +260,7 @@ namespace backEnd.Controllers
                         System.Data.DataTable SqlDataFileOwner = db.get(sqlFileOwner);
                         foreach (DataRow dr in SqlDataFileOwner.Rows)
                         {
-                            worksheet.Cell(index + 1, 1).Value = dr["namefile"].ToString();
+                            worksheet.Cell(index + 1, 1).Value = dr["path"].ToString() + "/" + dr["namefile"].ToString();
 
 
                             index++;
@@ -287,7 +287,7 @@ namespace backEnd.Controllers
                            foreach (DataRow dt in SqlDataFileShare2.Rows){
                                if (Convert.ToInt32(dr["id"]) == Convert.ToInt32(dt["mainfolder"]) && Convert.ToInt32(dr["share"]) != Convert.ToInt32(dt["share"])) {
                                    if(x == 0){
-                                    worksheet.Cell(index, 1).Value = dr["namefile"].ToString();
+                                    worksheet.Cell(index, 1).Value = dr["path"].ToString() + "/" + dr["namefile"].ToString();
                                     int drNum = Convert.ToInt32(dt["share"]);
                                     string sqlUsernameShareTo = $"SELECT * FROM user Where Id = '{drNum}'";
                                     System.Data.DataTable SqlDataFileShareTo = db.get(sqlUsernameShareTo);
@@ -336,7 +336,7 @@ namespace backEnd.Controllers
                         System.Data.DataTable SqlDataFileReceiverShare = db.get(sqlFileReceiverShare);
                         foreach (DataRow dr in SqlDataFileReceiverShare.Rows)
                         {
-                            worksheet.Cell(index + 1, 1).Value = dr["namefile"].ToString();
+                            worksheet.Cell(index + 1, 1).Value = dr["path"].ToString() + "/" + dr["namefile"].ToString();
 
                             int drNum = Convert.ToInt32(dr["IdUser"]);
                                     string sqlUsernameShareTo1 = $"SELECT * FROM user Where Id = '{drNum}'";
